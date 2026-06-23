@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chi tiết sản phẩm | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section id="content" class="max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <div class="grid place-items-center py-24"><div class="skeleton w-10 h-10 rounded-full"></div></div>
+</section>
+
+<section id="reviews-section" class="max-w-[1200px] mx-auto px-4 md:px-8 pb-16 hidden">
+  <h2 class="font-display text-2xl font-medium mb-6">Đánh giá từ khách hàng</h2>
+  <div id="review-form-wrap" class="card p-5 mb-6"></div>
+  <div id="reviews-list" class="space-y-4"></div>
+  <p id="no-reviews" class="hidden text-on-surface-variant text-sm">Chưa có đánh giá nào cho sản phẩm này.</p>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+renderNavbar('products');
+
+function getSku() { return new URLSearchParams(window.location.search).get('sku'); }
+function productImage(p) { return `https://picsum.photos/seed/${p.sku}/800/800`; }
+
+let currentProduct = null;
+
+async function load() {
+  const sku = getSku();
+  if (!sku) { window.location.href = '/products.html'; return; }
+  try {
+    const p = await api('/products/' + sku, { auth: false });
+    currentProduct = p;
+    document.title = p.name + ' | NT-II';
+    document.getElementById('content').innerHTML = `
+      <div class="grid md:grid-cols-2 gap-10 md:gap-14">
+        <div class="rounded-lg overflow-hidden aspect-square bg-secondary-container/20">
+          <img src="${productImage(p)}" class="w-full h-full object-cover" alt="${p.name}"/>
+        </div>
+        <div>
+          <p class="text-label-caps text-primary mb-3">${p.category_name || ''} · ${p.brand_name || ''}</p>
+          <h1 class="font-display text-3xl md:text-4xl font-semibold mb-3">${p.name}</h1>
+          <div class="flex items-center gap-2 mb-5">
+            <span class="material-symbols-outlined text-primary text-lg">star</span>
+            <span class="text-sm text-on-surface-variant">${p.avg_rating > 0 ? `${p.avg_rating} / 5 (${p.review_count} đánh giá)` : 'Chưa có đánh giá'}</span>
+          </div>
+          <div class="flex items-end gap-3 mb-6">
+            <span class="font-display text-3xl text-primary font-semibold">${formatVND(p.price)}</span>
+            ${Number(p.original_price) > Number(p.price) ? `<span class="text-on-surface-variant line-through mb-1">${formatVND(p.original_price)}</span>` : ''}
+          </div>
+
+          ${p.ingredients ? `<div class="mb-5"><p class="text-label-caps text-on-surface-variant mb-2">Thành phần chính</p><p class="text-sm leading-relaxed">${p.ingredients}</p></div>` : ''}
+          ${p.usage_instructions ? `<div class="mb-8"><p class="text-label-caps text-on-surface-variant mb-2">Hướng dẫn sử dụng</p><p class="text-sm leading-relaxed">${p.usage_instructions}</p></div>` : ''}
+
+          <div class="flex items-center gap-4 mb-3">
+            <div class="flex items-center border border-outline-variant rounded">
+              <button onclick="changeQty(-1)" class="w-10 h-10 flex items-center justify-center">−</button>
+              <input id="qty" type="number" value="1" min="1" max="${p.stock_quantity}" class="w-12 h-10 text-center border-0 outline-none"/>
+              <button onclick="changeQty(1)" class="w-10 h-10 flex items-center justify-center">+</button>
+            </div>
+            <button id="add-cart-btn" onclick="addToCart()" class="btn-primary flex-1" ${!p.in_stock ? 'disabled' : ''}>
+              ${p.in_stock ? 'Thêm vào giỏ' : 'Hết hàng'}
+            </button>
+          </div>
+          <p class="text-xs text-on-surface-variant">${p.in_stock ? `Còn ${p.stock_quantity} sản phẩm trong kho` : 'Sản phẩm tạm hết hàng'}</p>
+        </div>
+      </div>`;
+    document.getElementById('reviews-section').classList.remove('hidden');
+    loadReviews(sku);
+    renderReviewForm();
+  } catch (err) {
+    document.getElementById('content').innerHTML = `<p class="text-center text-on-surface-variant py-20">${err.message}</p>`;
+  }
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qty');
+  const max = Number(input.max) || 999;
+  const v = Math.min(max, Math.max(1, parseInt(input.value || '1') + delta));
+  input.value = v;
+}
+
+function addToCart() {
+  const quantity = parseInt(document.getElementById('qty').value || '1');
+  CartStore.add(currentProduct, quantity);
+  showToast('Đã thêm vào giỏ hàng');
+}
+
+function renderReviewForm() {
+  const wrap = document.getElementById('review-form-wrap');
+  if (!Auth.isLoggedIn()) {
+    wrap.innerHTML = `<p class="text-sm text-on-surface-variant"><a href="/login.html" class="text-primary font-semibold">Đăng nhập</a> để viết đánh giá cho sản phẩm này.</p>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <form id="review-form" class="space-y-3">
+      <p class="text-label-caps text-on-surface-variant">Viết đánh giá của bạn</p>
+      <div class="flex gap-1" id="star-input">
+        ${[1,2,3,4,5].map(i => `<span data-star="${i}" class="material-symbols-outlined cursor-pointer text-2xl text-outline-variant" onclick="setStar(${i})">star</span>`).join('')}
+      </div>
+      <textarea id="review-comment" rows="2" class="input-field" placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
+      <button type="submit" class="btn-ghost">Gửi đánh giá</button>
+    </form>`;
+  document.getElementById('review-form').addEventListener('submit', submitReview);
+}
+
+let selectedStar = 5;
+function setStar(n) {
+  selectedStar = n;
+  document.querySelectorAll('#star-input span').forEach(s => {
+    s.classList.toggle('text-primary', Number(s.dataset.star) <= n);
+    s.classList.toggle('text-outline-variant', Number(s.dataset.star) > n);
+  });
+}
+setStar(5);
+
+async function submitReview(e) {
+  e.preventDefault();
+  try {
+    await api(`/products/${currentProduct.sku}/reviews`, {
+      method: 'POST',
+      body: { rating: selectedStar, comment: document.getElementById('review-comment').value },
+    });
+    showToast('Đã gửi đánh giá, cảm ơn bạn!');
+    document.getElementById('review-comment').value = '';
+    loadReviews(currentProduct.sku);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function loadReviews(sku) {
+  try {
+    const reviews = await api(`/products/${sku}/reviews`, { auth: false });
+    document.getElementById('no-reviews').classList.toggle('hidden', reviews.length > 0);
+    document.getElementById('reviews-list').innerHTML = reviews.map(r => `
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-medium text-sm">${r.full_name}</span>
+          <span class="text-primary text-sm">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+        </div>
+        <p class="text-xs text-on-surface-variant mb-2">${new Date(r.created_at).toLocaleDateString('vi-VN')}</p>
+        ${r.comment ? `<p class="text-sm">${r.comment}</p>` : ''}
+      </div>`).join('');
+  } catch (err) { /* ignore */ }
+}
+
+load();
+</script>
+</body>
+</html>

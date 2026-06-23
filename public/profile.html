@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hồ sơ của tôi | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[900px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <div class="flex items-center gap-6 mb-8 text-sm">
+    <a href="/profile.html" class="text-primary font-semibold border-b-2 border-primary pb-1">Hồ sơ của tôi</a>
+    <a href="/order-history.html" class="text-on-surface-variant hover:text-primary">Lịch sử mua hàng</a>
+  </div>
+
+  <div class="flex items-center justify-between mb-8 flex-wrap gap-3">
+    <h1 class="font-display text-3xl font-semibold">Hồ sơ của tôi</h1>
+    <div id="membership-badge" class="chip text-sm"></div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <form id="profile-form" class="card p-6 space-y-5">
+      <h2 class="text-label-caps text-on-surface-variant">Thông tin cá nhân</h2>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Họ và tên</label>
+        <input id="full_name" class="input-field"/>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Email</label>
+        <input id="email" disabled class="input-field opacity-60"/>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Số điện thoại</label>
+        <input id="phone" class="input-field"/>
+      </div>
+      <h2 class="text-label-caps text-on-surface-variant pt-2">Địa chỉ nhận hàng mặc định</h2>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Người nhận</label>
+        <input id="recipient_name" class="input-field"/>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">SĐT người nhận</label>
+        <input id="recipient_phone" class="input-field"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-label-caps text-on-surface-variant">Tỉnh/Thành</label><input id="province_city" class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Phường/Xã</label><input id="ward" class="input-field"/></div>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Địa chỉ cụ thể</label>
+        <textarea id="specific_address" rows="2" class="input-field"></textarea>
+      </div>
+      <p id="profile-msg" class="text-sm hidden"></p>
+      <button type="submit" class="btn-primary w-full">Lưu thay đổi</button>
+    </form>
+
+    <div class="space-y-6">
+      <form id="password-form" class="card p-6 space-y-5">
+        <h2 class="text-label-caps text-on-surface-variant">Đổi mật khẩu</h2>
+        <div>
+          <label class="text-label-caps text-on-surface-variant">Mật khẩu hiện tại</label>
+          <input type="password" id="currentPassword" required class="input-field"/>
+        </div>
+        <div>
+          <label class="text-label-caps text-on-surface-variant">Mật khẩu mới</label>
+          <input type="password" id="newPassword" required minlength="6" class="input-field"/>
+        </div>
+        <p id="password-msg" class="text-sm hidden"></p>
+        <button type="submit" class="btn-ghost w-full">Đổi mật khẩu</button>
+      </form>
+
+      <div class="card p-6">
+        <h2 class="text-label-caps text-on-surface-variant mb-3">Hồ sơ làn da</h2>
+        <div id="skin-profile-view" class="text-sm text-on-surface-variant mb-4">Chưa có dữ liệu.</div>
+        <a href="/skin-quiz.html" class="btn-ghost w-full text-center block">Làm lại bài trắc nghiệm</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAuth();
+renderNavbar();
+
+const SKIN_TYPE_LABEL = { Oily: 'Da dầu', Dry: 'Da khô', Combination: 'Da hỗn hợp', Sensitive: 'Da nhạy cảm' };
+
+async function load() {
+  try {
+    const me = await api('/profile');
+    document.getElementById('full_name').value = me.full_name || '';
+    document.getElementById('email').value = me.email || '';
+    document.getElementById('phone').value = me.phone || '';
+    document.getElementById('recipient_name').value = me.recipient_name || '';
+    document.getElementById('recipient_phone').value = me.recipient_phone || '';
+    document.getElementById('province_city').value = me.province_city || '';
+    document.getElementById('ward').value = me.ward || '';
+    document.getElementById('specific_address').value = me.specific_address || '';
+    document.getElementById('membership-badge').textContent = `${me.membership_level} · ${me.accumulated_points} điểm`;
+
+    if (me.skin_profile) {
+      document.getElementById('skin-profile-view').innerHTML = `
+        <p><strong class="text-on-surface">Loại da:</strong> ${SKIN_TYPE_LABEL[me.skin_profile.skin_type] || me.skin_profile.skin_type}</p>
+        ${me.skin_profile.primary_concern ? `<p><strong class="text-on-surface">Vấn đề quan tâm:</strong> ${me.skin_profile.primary_concern}</p>` : ''}
+        ${me.skin_profile.allergy_ingredients ? `<p><strong class="text-on-surface">Dị ứng:</strong> ${me.skin_profile.allergy_ingredients}</p>` : ''}`;
+    }
+  } catch (err) { showToast(err.message, 'error'); }
+}
+load();
+
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('profile-msg');
+  try {
+    const updated = await api('/profile', {
+      method: 'PUT',
+      body: {
+        full_name: document.getElementById('full_name').value,
+        phone: document.getElementById('phone').value,
+        recipient_name: document.getElementById('recipient_name').value,
+        recipient_phone: document.getElementById('recipient_phone').value,
+        province_city: document.getElementById('province_city').value,
+        ward: document.getElementById('ward').value,
+        specific_address: document.getElementById('specific_address').value,
+      },
+    });
+    Auth.setUser({ ...Auth.getUser(), ...updated });
+    msg.textContent = 'Đã lưu thay đổi.'; msg.className = 'text-sm text-primary'; msg.classList.remove('hidden');
+    showToast('Cập nhật hồ sơ thành công');
+  } catch (err) {
+    msg.textContent = err.message; msg.className = 'text-sm text-error'; msg.classList.remove('hidden');
+  }
+});
+
+document.getElementById('password-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('password-msg');
+  try {
+    await api('/profile/password', {
+      method: 'PUT',
+      body: {
+        currentPassword: document.getElementById('currentPassword').value,
+        newPassword: document.getElementById('newPassword').value,
+      },
+    });
+    msg.textContent = 'Đổi mật khẩu thành công.'; msg.className = 'text-sm text-primary'; msg.classList.remove('hidden');
+    document.getElementById('password-form').reset();
+  } catch (err) {
+    msg.textContent = err.message; msg.className = 'text-sm text-error'; msg.classList.remove('hidden');
+  }
+});
+</script>
+</body>
+</html>

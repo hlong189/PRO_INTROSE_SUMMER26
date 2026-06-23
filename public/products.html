@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sản phẩm | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-12">
+  <h1 class="font-display text-3xl font-semibold mb-6">Danh sách sản phẩm</h1>
+
+  <!-- Filters -->
+  <div class="card p-4 md:p-5 mb-8 grid md:grid-cols-5 gap-3">
+    <div class="md:col-span-2 relative">
+      <span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+      <input id="f-search" type="text" placeholder="Tìm theo tên hoặc thành phần..." class="input-field pl-7"/>
+    </div>
+    <select id="f-category" class="input-field"><option value="">Tất cả danh mục</option></select>
+    <select id="f-brand" class="input-field"><option value="">Tất cả nhãn hàng</option></select>
+    <select id="f-sort" class="input-field">
+      <option value="newest">Mới nhất</option>
+      <option value="price_asc">Giá: Thấp → Cao</option>
+      <option value="price_desc">Giá: Cao → Thấp</option>
+      <option value="rating">Đánh giá cao nhất</option>
+    </select>
+  </div>
+
+  <p id="result-count" class="text-sm text-on-surface-variant mb-4"></p>
+  <div id="products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-5 min-h-[200px]"></div>
+  <p id="empty-msg" class="hidden text-center text-on-surface-variant py-16">Không tìm thấy sản phẩm phù hợp.</p>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+renderNavbar('products');
+
+function productImage(p) { return `https://picsum.photos/seed/${p.sku}/600/600`; }
+
+function productCard(p) {
+  return `
+  <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden group block">
+    <div class="aspect-square overflow-hidden bg-secondary-container/20">
+      <img src="${productImage(p)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="${p.name}"/>
+    </div>
+    <div class="p-4">
+      <p class="text-label-caps text-on-surface-variant mb-1">${p.brand_name || ''}</p>
+      <h3 class="font-display text-base font-medium leading-snug mb-2">${p.name}</h3>
+      <div class="flex items-center justify-between">
+        <span class="font-semibold text-primary">${formatVND(p.price)}</span>
+        ${!p.in_stock ? '<span class="text-xs text-error">Hết hàng</span>' : (p.avg_rating > 0 ? `<span class="text-xs text-on-surface-variant">★ ${p.avg_rating}</span>` : '')}
+      </div>
+    </div>
+  </a>`;
+}
+
+function getParams() {
+  return {
+    q: document.getElementById('f-search').value,
+    category: document.getElementById('f-category').value,
+    brand: document.getElementById('f-brand').value,
+    sort: document.getElementById('f-sort').value,
+  };
+}
+
+async function loadFilters() {
+  const cats = await api('/categories', { auth: false });
+  const catSel = document.getElementById('f-category');
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.category_name; opt.textContent = `${c.category_name} (${c.product_count})`;
+    catSel.appendChild(opt);
+  });
+
+  const brands = await api('/brands', { auth: false });
+  const brandSel = document.getElementById('f-brand');
+  brands.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.brand_name; opt.textContent = `${b.brand_name} (${b.product_count})`;
+    brandSel.appendChild(opt);
+  });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('category')) catSel.value = urlParams.get('category');
+  if (urlParams.get('brand')) brandSel.value = urlParams.get('brand');
+  if (urlParams.get('q')) document.getElementById('f-search').value = urlParams.get('q');
+}
+
+async function loadProducts() {
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = Array.from({length:8}).map(() => '<div class="skeleton aspect-square rounded-lg"></div>').join('');
+  const params = getParams();
+  const qs = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v)));
+  try {
+    const products = await api('/products?' + qs.toString(), { auth: false });
+    document.getElementById('result-count').textContent = `${products.length} sản phẩm`;
+    grid.innerHTML = products.map(productCard).join('');
+    document.getElementById('empty-msg').classList.toggle('hidden', products.length > 0);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+['f-search','f-category','f-brand','f-sort'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener(id === 'f-search' ? 'input' : 'change', debounce(loadProducts, 300));
+});
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+(async () => {
+  await loadFilters();
+  loadProducts();
+})();
+</script>
+</body>
+</html>

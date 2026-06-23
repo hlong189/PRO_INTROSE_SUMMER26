@@ -1,0 +1,11 @@
+id,product_id,user_id,rating,comment,parent_id,is_hidden,created_at
+51,3,28,5,"We're sorry to hear that, please contact our support team.",38,0,2025-12-30 11:52:25
+52,20,10,3,"Thank you for your feedback, we're glad you liked it!",21,0,2025-11-01 07:12:22
+53,41,7,5,"Thank you for your feedback, we're glad you liked it!",42,0,2026-02-16 15:42:39
+54,11,44,3,Thanks for sharing your experience with other customers!,39,0,2026-03-09 16:51:31
+55,50,50,4,"Thank you for your feedback, we're glad you liked it!",19,0,2026-06-11 00:36:27
+56,50,48,4,"We're sorry to hear that, please contact our support team.",55,0,2025-10-04 12:34:24
+57,47,44,3,Thanks for sharing your experience with other customers!,34,0,2025-09-27 23:59:36
+58,37,29,4,"We're sorry to hear that, please contact our support team.",48,0,2026-03-24 16:25:09
+59,14,19,5,"We're sorry to hear that, please contact our support team.",4,0,2025-12-13 14:23:41
+60,30,19,4,"We're sorry to hear that, please contact our support team.",8,0,2026-03-21 13:02:20

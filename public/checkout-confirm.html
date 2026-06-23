@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Xác nhận thanh toán | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[700px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <!-- Stepper -->
+  <div class="flex items-center justify-center gap-2 mb-10 text-xs text-on-surface-variant">
+    <span class="text-primary font-semibold">1. Xác nhận thông tin</span>
+    <span>—</span><span>2. Thanh toán</span><span>—</span><span>3. Hoàn tất</span>
+  </div>
+
+  <h1 class="font-display text-2xl font-semibold mb-2">Xác nhận thông tin giao hàng</h1>
+  <p class="text-on-surface-variant mb-8 text-sm">Vui lòng kiểm tra lại địa chỉ giao hàng và đơn hàng trước khi tiếp tục.</p>
+
+  <div class="card p-6 mb-6">
+    <h2 class="text-label-caps text-on-surface-variant mb-4">Đơn hàng của bạn</h2>
+    <div id="order-summary" class="space-y-3 mb-4"></div>
+
+    <div class="flex gap-2 mb-4">
+      <input id="voucher-code" placeholder="Mã giảm giá (nếu có)" class="input-field flex-1"/>
+      <button type="button" onclick="applyVoucher()" class="btn-ghost whitespace-nowrap px-4">Áp dụng</button>
+    </div>
+    <p id="voucher-msg" class="text-sm mb-4 hidden"></p>
+
+    <div class="border-t border-outline-variant pt-4 space-y-1">
+      <div class="flex justify-between text-sm"><span class="text-on-surface-variant">Tạm tính</span><span id="sum-subtotal"></span></div>
+      <div class="flex justify-between text-sm" id="sum-discount-row" style="display:none;"><span class="text-on-surface-variant">Giảm giá</span><span id="sum-discount" class="text-primary"></span></div>
+      <div class="flex justify-between font-display font-semibold pt-2"><span>Tổng tạm tính</span><span id="sum-total" class="text-primary"></span></div>
+    </div>
+  </div>
+
+  <form id="confirm-form" class="card p-6 space-y-5">
+    <h2 class="text-label-caps text-on-surface-variant">Thông tin nhận hàng</h2>
+    <div>
+      <label class="text-label-caps text-on-surface-variant">Họ và tên người nhận</label>
+      <input id="recipient_name" required class="input-field"/>
+    </div>
+    <div>
+      <label class="text-label-caps text-on-surface-variant">Số điện thoại</label>
+      <input id="recipient_phone" required class="input-field"/>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Tỉnh / Thành phố</label>
+        <input id="province_city" required class="input-field"/>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Phường / Xã</label>
+        <input id="ward" required class="input-field"/>
+      </div>
+    </div>
+    <div>
+      <label class="text-label-caps text-on-surface-variant">Địa chỉ cụ thể (số nhà, đường)</label>
+      <textarea id="specific_address" required rows="2" class="input-field"></textarea>
+    </div>
+    <button type="submit" class="btn-primary w-full">Tiếp tục đến phương thức thanh toán</button>
+  </form>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAuth();
+renderNavbar();
+
+const SHIPPING_FEE = 30000;
+const FREE_SHIP_THRESHOLD = 500000;
+let appliedDiscount = 0;
+let appliedVoucherCode = null;
+
+function renderSummary() {
+  const items = CartStore.getAll();
+  if (!items.length) { window.location.href = '/cart.html'; return; }
+  document.getElementById('order-summary').innerHTML = items.map(i => `
+    <div class="flex justify-between text-sm">
+      <span>${i.name} <span class="text-on-surface-variant">x${i.quantity}</span></span>
+      <span>${formatVND(i.price * i.quantity)}</span>
+    </div>`).join('');
+  updateTotals();
+}
+
+function updateTotals() {
+  const subtotal = CartStore.subtotal();
+  const afterDiscount = Math.max(0, subtotal - appliedDiscount);
+  document.getElementById('sum-subtotal').textContent = formatVND(subtotal);
+  if (appliedDiscount > 0) {
+    document.getElementById('sum-discount-row').style.display = 'flex';
+    document.getElementById('sum-discount').textContent = '−' + formatVND(appliedDiscount);
+  }
+  const shippingNote = afterDiscount >= FREE_SHIP_THRESHOLD ? ' (đã gồm miễn phí vận chuyển)' : ' (chưa gồm phí vận chuyển)';
+  document.getElementById('sum-total').textContent = formatVND(afterDiscount) ;
+  document.getElementById('sum-total').nextSibling;
+}
+
+async function applyVoucher() {
+  const code = document.getElementById('voucher-code').value.trim();
+  const msg = document.getElementById('voucher-msg');
+  if (!code) return;
+  try {
+    const result = await api('/orders/validate-voucher', { method: 'POST', body: { code, subtotal: CartStore.subtotal() } });
+    appliedDiscount = result.discount_amount;
+    appliedVoucherCode = result.code;
+    msg.textContent = `Áp dụng mã "${result.code}" thành công — giảm ${formatVND(result.discount_amount)}.`;
+    msg.className = 'text-sm text-primary mb-4'; msg.classList.remove('hidden');
+    updateTotals();
+  } catch (err) {
+    appliedDiscount = 0; appliedVoucherCode = null;
+    msg.textContent = err.message; msg.className = 'text-sm text-error mb-4'; msg.classList.remove('hidden');
+    updateTotals();
+  }
+}
+
+async function prefill() {
+  try {
+    const me = await api('/profile');
+    document.getElementById('recipient_name').value = me.recipient_name || me.full_name || '';
+    document.getElementById('recipient_phone').value = me.recipient_phone || me.phone || '';
+    document.getElementById('province_city').value = me.province_city || '';
+    document.getElementById('ward').value = me.ward || '';
+    document.getElementById('specific_address').value = me.specific_address || '';
+  } catch (err) { /* ignore */ }
+}
+
+renderSummary();
+prefill();
+
+document.getElementById('confirm-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const shipping = {
+    recipient_name: document.getElementById('recipient_name').value,
+    recipient_phone: document.getElementById('recipient_phone').value,
+    province_city: document.getElementById('province_city').value,
+    ward: document.getElementById('ward').value,
+    specific_address: document.getElementById('specific_address').value,
+    voucher_code: appliedVoucherCode,
+    discount_amount: appliedDiscount,
+  };
+  sessionStorage.setItem('ntii_checkout', JSON.stringify(shipping));
+  window.location.href = '/checkout-payment.html';
+});
+</script>
+</body>
+</html>

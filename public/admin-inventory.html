@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quản lý kho & tồn kho | NT-II Ops</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+
+<header class="sticky top-0 z-50 bg-on-surface text-white">
+  <div class="max-w-[1300px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <span class="font-display text-xl font-semibold">NT-II <span class="text-primary-container">Ops</span></span>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="/admin-dashboard.html" class="text-white/70 hover:text-white">Bảng điều khiển</a>
+        <a href="/admin-inventory.html" class="font-semibold border-b-2 border-primary-container pb-1">Quản lý kho</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="/index.html" class="text-white/70 hover:text-white">Xem website →</a>
+      <button onclick="Auth.logout()" class="btn-ghost text-white border-white/40 hover:bg-white/10 py-1.5 px-4">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<section class="max-w-[1300px] mx-auto px-4 md:px-8 py-8 md:py-10">
+  <h1 class="font-display text-3xl font-semibold mb-1">Quản lý kho & tồn kho</h1>
+  <p class="text-on-surface-variant mb-6">Quản lý sản phẩm, nhập kho theo lô hàng, đơn hàng và nhập dữ liệu vào database.</p>
+
+  <!-- Tabs -->
+  <div class="flex gap-2 mb-6 border-b border-outline-variant">
+    <button data-tab="products" onclick="switchTab('products')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary">Sản phẩm</button>
+    <button data-tab="batches" onclick="switchTab('batches')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-on-surface-variant">Nhập kho (Lô hàng)</button>
+    <button data-tab="orders" onclick="switchTab('orders')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-on-surface-variant">Đơn hàng</button>
+  </div>
+
+  <!-- TAB: Products -->
+  <div id="tab-products">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <input id="search-input" placeholder="Tìm sản phẩm theo tên hoặc SKU..." class="input-field max-w-xs" oninput="renderTable()"/>
+      <div class="flex gap-3">
+        <button onclick="document.getElementById('import-dialog').classList.remove('hidden')" class="btn-ghost">⇪ Nhập CSV</button>
+        <button onclick="openProductForm()" class="btn-primary">+ Thêm sản phẩm</button>
+      </div>
+    </div>
+
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-3 px-4">SKU / Sản phẩm</th><th>Danh mục</th><th>Nhãn hàng</th><th>Giá</th><th>Tồn kho</th><th>Trạng thái</th><th class="px-4">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="product-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Batches -->
+  <div id="tab-batches" class="hidden">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <p class="text-sm text-on-surface-variant">Mỗi lần nhập kho tạo 1 lô hàng gắn với nhà cung cấp — số lượng sẽ tự động cộng vào tồn kho sản phẩm.</p>
+      <button onclick="openBatchForm()" class="btn-primary whitespace-nowrap">+ Nhập kho</button>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-3 px-4">Mã lô</th><th>Sản phẩm</th><th>Nhà cung cấp</th><th>SL nhập</th><th>SL còn lại</th><th>Giá nhập</th><th>HSD</th>
+          </tr>
+        </thead>
+        <tbody id="batch-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Orders -->
+  <div id="tab-orders" class="hidden">
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-3 px-4">Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái đơn</th><th>Vận chuyển</th><th class="px-4">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="order-rows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Dialog: Thêm / Sửa sản phẩm -->
+<div id="product-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+  <div class="card bg-white w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+    <h2 class="font-display text-xl font-semibold mb-4" id="dialog-title">Thêm sản phẩm</h2>
+    <form id="product-form" class="space-y-4">
+      <input type="hidden" id="p-id"/>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">SKU</label><input id="p-sku" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Tên sản phẩm</label><input id="p-name" required class="input-field"/></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">Danh mục</label><input id="p-category" required class="input-field" placeholder="Serum & Tinh chất"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Nhãn hàng</label><input id="p-brand" required class="input-field" placeholder="NT-II"/></div>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">Giá bán (đ)</label><input id="p-price" type="number" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Giá gốc (đ)</label><input id="p-original-price" type="number" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Tồn kho</label><input id="p-stock" type="number" class="input-field"/></div>
+      </div>
+      <div><label class="text-label-caps text-on-surface-variant">Thành phần</label><textarea id="p-ingredients" rows="2" class="input-field"></textarea></div>
+      <div><label class="text-label-caps text-on-surface-variant">Hướng dẫn sử dụng</label><textarea id="p-usage" rows="2" class="input-field"></textarea></div>
+      <p id="form-error" class="text-error text-sm hidden"></p>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeProductForm()" class="btn-ghost flex-1">Hủy</button>
+        <button type="submit" class="btn-primary flex-1">Lưu vào database</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Dialog: Nhập kho -->
+<div id="batch-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+  <div class="card bg-white w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+    <h2 class="font-display text-xl font-semibold mb-4">Nhập kho — Tạo lô hàng mới</h2>
+    <form id="batch-form" class="space-y-4">
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Sản phẩm</label>
+        <select id="b-product" required class="input-field"></select>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant">Nhà cung cấp</label>
+        <select id="b-supplier" required class="input-field"></select>
+        <button type="button" onclick="document.getElementById('new-supplier-row').classList.toggle('hidden')" class="text-xs text-primary mt-1">+ Thêm nhà cung cấp mới</button>
+        <div id="new-supplier-row" class="hidden mt-2 flex gap-2">
+          <input id="new-supplier-name" placeholder="Tên nhà cung cấp mới" class="input-field"/>
+          <button type="button" onclick="createSupplier()" class="btn-ghost whitespace-nowrap">Tạo</button>
+        </div>
+      </div>
+      <div><label class="text-label-caps text-on-surface-variant">Mã lô hàng</label><input id="b-code" required class="input-field" placeholder="LOT-XXXX-01"/></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">Số lượng nhập</label><input id="b-quantity" type="number" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Giá nhập (đ)</label><input id="b-price" type="number" required class="input-field"/></div>
+      </div>
+      <div><label class="text-label-caps text-on-surface-variant">Ngày hết hạn</label><input id="b-expiry" type="date" required class="input-field"/></div>
+      <p id="batch-error" class="text-error text-sm hidden"></p>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="document.getElementById('batch-dialog').classList.add('hidden')" class="btn-ghost flex-1">Hủy</button>
+        <button type="submit" class="btn-primary flex-1">Nhập kho</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Dialog: Nhập dữ liệu CSV -->
+<div id="import-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+  <div class="card bg-white w-full max-w-lg p-6">
+    <h2 class="font-display text-xl font-semibold mb-2">Nhập dữ liệu sản phẩm từ CSV</h2>
+    <p class="text-sm text-on-surface-variant mb-4">
+      Cột CSV cần có: <code class="text-xs bg-secondary-container/40 px-1 rounded">sku, name, category_name, brand_name, price, original_price, stock_quantity, ingredients, usage_instructions</code>.
+      Sản phẩm trùng <code>sku</code> sẽ được cập nhật, sản phẩm mới sẽ được thêm thẳng vào database.
+    </p>
+    <input type="file" id="csv-file" accept=".csv" class="input-field mb-4"/>
+    <p id="import-result" class="text-sm mb-4"></p>
+    <div class="flex gap-3">
+      <button onclick="document.getElementById('import-dialog').classList.add('hidden')" class="btn-ghost flex-1">Đóng</button>
+      <button onclick="doImport()" class="btn-primary flex-1">Nhập dữ liệu</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+requireAdmin();
+
+let allProducts = [];
+let allSuppliers = [];
+
+function switchTab(tab) {
+  ['products', 'batches', 'orders'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+    const btn = document.querySelector(`.tab-btn[data-tab="${t}"]`);
+    btn.classList.toggle('border-primary', t === tab);
+    btn.classList.toggle('text-primary', t === tab);
+    btn.classList.toggle('border-transparent', t !== tab);
+    btn.classList.toggle('text-on-surface-variant', t !== tab);
+  });
+  if (tab === 'batches') loadBatches();
+  if (tab === 'orders') loadOrders();
+}
+
+// ---------- Products ----------
+function statusBadge(p) {
+  if (!p.is_active) return '<span class="chip bg-outline-variant text-on-surface-variant">Đã ẩn</span>';
+  if (p.stock_quantity === 0) return '<span class="chip" style="background:#ffdad6;color:#ba1a1a;">Hết hàng</span>';
+  if (p.stock_quantity <= 10) return '<span class="chip" style="background:#fff3cd;color:#8a6d00;">Sắp hết</span>';
+  return '<span class="chip">Còn hàng</span>';
+}
+
+function renderTable() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+  document.getElementById('product-rows').innerHTML = filtered.map(p => `
+    <tr class="border-b border-outline-variant/60">
+      <td class="py-3 px-4">
+        <p class="font-medium">${p.name}</p>
+        <p class="text-xs text-on-surface-variant">${p.sku}</p>
+      </td>
+      <td>${p.category_name}</td>
+      <td>${p.brand_name}</td>
+      <td>${formatVND(p.price)}</td>
+      <td>
+        <div class="flex items-center gap-1">
+          <button onclick="adjustStock(${p.id}, -1)" class="w-6 h-6 border border-outline-variant rounded text-xs">−</button>
+          <span class="w-8 text-center">${p.stock_quantity}</span>
+          <button onclick="adjustStock(${p.id}, 1)" class="w-6 h-6 border border-outline-variant rounded text-xs">+</button>
+        </div>
+      </td>
+      <td>${statusBadge(p)}</td>
+      <td class="px-4">
+        <button onclick="editProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary" title="Sửa">edit</button>
+        <button onclick="deleteProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-error" title="Xóa">delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadProducts() {
+  allProducts = await api('/admin/products');
+  renderTable();
+}
+
+async function adjustStock(id, delta) {
+  const p = allProducts.find(x => x.id === id);
+  const newStock = Math.max(0, p.stock_quantity + delta);
+  try {
+    await api(`/admin/products/${id}/stock`, { method: 'PUT', body: { stock_quantity: newStock } });
+    p.stock_quantity = newStock;
+    renderTable();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function openProductForm() {
+  document.getElementById('dialog-title').textContent = 'Thêm sản phẩm';
+  document.getElementById('product-form').reset();
+  document.getElementById('p-id').value = '';
+  document.getElementById('form-error').classList.add('hidden');
+  document.getElementById('product-dialog').classList.remove('hidden');
+}
+function closeProductForm() { document.getElementById('product-dialog').classList.add('hidden'); }
+
+function editProduct(id) {
+  const p = allProducts.find(x => x.id === id);
+  document.getElementById('dialog-title').textContent = 'Sửa sản phẩm';
+  document.getElementById('p-id').value = p.id;
+  document.getElementById('p-sku').value = p.sku;
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-category').value = p.category_name;
+  document.getElementById('p-brand').value = p.brand_name;
+  document.getElementById('p-price').value = p.price;
+  document.getElementById('p-original-price').value = p.original_price;
+  document.getElementById('p-stock').value = p.stock_quantity;
+  document.getElementById('p-ingredients').value = p.ingredients || '';
+  document.getElementById('p-usage').value = p.usage_instructions || '';
+  document.getElementById('form-error').classList.add('hidden');
+  document.getElementById('product-dialog').classList.remove('hidden');
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Bạn có chắc muốn xóa sản phẩm này khỏi database?')) return;
+  try {
+    const result = await api(`/admin/products/${id}`, { method: 'DELETE' });
+    showToast(result.message);
+    loadProducts();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+document.getElementById('product-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('form-error');
+  errEl.classList.add('hidden');
+  const id = document.getElementById('p-id').value;
+  const body = {
+    sku: document.getElementById('p-sku').value,
+    name: document.getElementById('p-name').value,
+    category_name: document.getElementById('p-category').value,
+    brand_name: document.getElementById('p-brand').value,
+    price: Number(document.getElementById('p-price').value),
+    original_price: Number(document.getElementById('p-original-price').value),
+    stock_quantity: Number(document.getElementById('p-stock').value || 0),
+    ingredients: document.getElementById('p-ingredients').value,
+    usage_instructions: document.getElementById('p-usage').value,
+  };
+  try {
+    if (id) await api(`/admin/products/${id}`, { method: 'PUT', body });
+    else await api('/admin/products', { method: 'POST', body });
+    showToast('Đã lưu sản phẩm vào database');
+    closeProductForm();
+    loadProducts();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  }
+});
+
+async function doImport() {
+  const fileInput = document.getElementById('csv-file');
+  const resultEl = document.getElementById('import-result');
+  if (!fileInput.files.length) { resultEl.textContent = 'Vui lòng chọn file CSV.'; resultEl.className = 'text-sm text-error mb-4'; return; }
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  resultEl.textContent = 'Đang nhập dữ liệu...'; resultEl.className = 'text-sm text-on-surface-variant mb-4';
+  try {
+    const data = await apiUpload('/admin/products/import', formData);
+    resultEl.textContent = data.message + (data.errors.length ? ` (${data.errors.length} lỗi)` : '');
+    resultEl.className = 'text-sm text-primary mb-4';
+    loadProducts();
+  } catch (err) {
+    resultEl.textContent = err.message;
+    resultEl.className = 'text-sm text-error mb-4';
+  }
+}
+
+// ---------- Batches (Nhập kho) ----------
+async function loadSuppliers() {
+  allSuppliers = await api('/admin/suppliers');
+  document.getElementById('b-supplier').innerHTML = allSuppliers.map(s => `<option value="${s.id}">${s.supplier_name}</option>`).join('');
+}
+
+async function createSupplier() {
+  const name = document.getElementById('new-supplier-name').value.trim();
+  if (!name) return;
+  try {
+    await api('/admin/suppliers', { method: 'POST', body: { supplier_name: name } });
+    await loadSuppliers();
+    document.getElementById('new-supplier-name').value = '';
+    document.getElementById('new-supplier-row').classList.add('hidden');
+    showToast('Đã thêm nhà cung cấp');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function openBatchForm() {
+  document.getElementById('b-product').innerHTML = allProducts.map(p => `<option value="${p.id}">${p.name} (${p.sku})</option>`).join('');
+  document.getElementById('batch-form').reset();
+  document.getElementById('batch-error').classList.add('hidden');
+  document.getElementById('batch-dialog').classList.remove('hidden');
+}
+
+document.getElementById('batch-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('batch-error');
+  errEl.classList.add('hidden');
+  const body = {
+    product_id: Number(document.getElementById('b-product').value),
+    supplier_id: Number(document.getElementById('b-supplier').value),
+    batch_code: document.getElementById('b-code').value,
+    quantity_imported: Number(document.getElementById('b-quantity').value),
+    import_price: Number(document.getElementById('b-price').value),
+    expiration_date: document.getElementById('b-expiry').value,
+  };
+  try {
+    await api('/admin/batches', { method: 'POST', body });
+    showToast('Đã nhập kho — tồn kho sản phẩm đã được cập nhật');
+    document.getElementById('batch-dialog').classList.add('hidden');
+    await loadProducts();
+    await loadBatches();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  }
+});
+
+async function loadBatches() {
+  const batches = await api('/admin/batches');
+  document.getElementById('batch-rows').innerHTML = batches.map(b => `
+    <tr class="border-b border-outline-variant/60">
+      <td class="py-3 px-4 font-medium">${b.batch_code}</td>
+      <td>${b.product_name} <span class="text-xs text-on-surface-variant">(${b.sku})</span></td>
+      <td>${b.supplier_name}</td>
+      <td>${b.quantity_imported}</td>
+      <td>${b.quantity_remaining}</td>
+      <td>${formatVND(b.import_price)}</td>
+      <td class="text-xs">${new Date(b.expiration_date).toLocaleDateString('vi-VN')}</td>
+    </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có lô hàng nào.</td></tr>';
+}
+
+// ---------- Orders ----------
+const ORDER_STATUSES = ['Pending_Payment', 'Processing', 'Shipping', 'Completed', 'Cancelled', 'Returned'];
+const STATUS_LABEL = {
+  Pending_Payment: 'Chờ thanh toán', Processing: 'Đang xử lý', Shipping: 'Đang giao',
+  Completed: 'Hoàn tất', Cancelled: 'Đã hủy', Returned: 'Đã trả hàng',
+};
+
+async function loadOrders() {
+  const orders = await api('/admin/orders');
+  document.getElementById('order-rows').innerHTML = orders.map(o => `
+    <tr class="border-b border-outline-variant/60">
+      <td class="py-3 px-4 font-medium">#NTII-${String(o.id).padStart(6,'0')}</td>
+      <td>${o.full_name}</td>
+      <td>${formatVND(o.final_amount)}</td>
+      <td>${o.payment_method || '—'} <span class="text-xs text-on-surface-variant">(${o.payment_status || '—'})</span></td>
+      <td>
+        <select onchange="updateOrderStatus(${o.id}, this.value)" class="input-field py-1 text-xs">
+          ${ORDER_STATUSES.map(s => `<option value="${s}" ${s === o.order_status ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td class="text-xs">${o.shipping_status || '—'}${o.tracking_number ? ' · ' + o.tracking_number : ''}</td>
+      <td class="px-4">
+        <button onclick="setTracking(${o.id})" class="text-xs text-primary font-medium">+ Mã vận đơn</button>
+      </td>
+    </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có đơn hàng nào.</td></tr>';
+}
+
+async function updateOrderStatus(id, order_status) {
+  try {
+    await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { order_status } });
+    showToast('Đã cập nhật trạng thái đơn hàng');
+    loadOrders();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function setTracking(id) {
+  const tracking_number = prompt('Nhập mã vận đơn:');
+  if (!tracking_number) return;
+  try {
+    await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { shipping_status: 'In_Transit', tracking_number } });
+    showToast('Đã cập nhật mã vận đơn');
+    loadOrders();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+(async () => {
+  await loadProducts();
+  await loadSuppliers();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+id,role_name,description
+1,Admin,System administrator with full access
+2,Warehouse_Staff,Manages inventory and stock batches
+3,Customer,Registered shopper on the platform

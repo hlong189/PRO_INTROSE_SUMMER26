@@ -1,0 +1,51 @@
+id,order_id,payment_method,payment_status,gateway_transaction_id,paid_at
+1,1,COD,Refunded,NULL,NULL
+2,2,Momo,Pending,NULL,NULL
+3,3,Bank_Transfer,Failed,10d08d11-25f9-44bf-9bb9-61555275eb94,NULL
+4,4,Momo,Completed,a21150f9-9fd3-4579-8667-72ce204e178c,2026-05-28 03:16:38
+5,5,Bank_Transfer,Completed,533f5a72-b64f-454a-8c61-165495da75c1,2026-01-07 03:25:57
+6,6,VNPay,Completed,87d292a6-98ee-4c2b-be9f-ecaa6182f347,2026-04-03 21:59:37
+7,7,VNPay,Refunded,9afd4015-816b-4b9f-b426-b1934b7e6b3c,NULL
+8,8,Momo,Refunded,b3a7d0e0-cb08-487d-9963-c26d6e218b09,NULL
+9,9,VNPay,Completed,a6a27967-a79b-44b6-9a50-9fed1d4a3d81,2025-10-04 12:23:04
+10,10,VNPay,Completed,b888f6ed-8d24-4e3e-84da-bddbe0b15aba,2025-10-24 09:48:40
+11,11,Momo,Completed,73991a47-6e19-4042-b70b-c063dd90e79e,2025-12-04 17:09:11
+12,12,COD,Completed,NULL,2026-04-14 12:28:25
+13,13,Momo,Completed,56c438e4-69ef-4fb1-ba7e-8e14e359eee1,2026-03-29 12:34:37
+14,14,VNPay,Completed,6a7e4c36-6613-4e69-b418-8109d3d1bf0f,2026-05-27 19:51:30
+15,15,Bank_Transfer,Completed,6d4067f4-5003-4b35-9857-8bafbac7e2b9,2025-10-28 16:54:03
+16,16,VNPay,Completed,5fd23109-4140-452c-aa44-825950018b7b,2025-11-14 11:47:21
+17,17,COD,Completed,NULL,2026-01-11 04:47:27
+18,18,Bank_Transfer,Completed,ec48bf55-afd3-40c4-a713-582cf41ea3ac,2026-03-21 14:39:12
+19,19,Bank_Transfer,Completed,d4ef00aa-175a-41ec-912f-a61279699ed2,2025-06-13 00:51:39
+20,20,VNPay,Completed,18b87245-6e8f-45a1-97dd-ed8115da705c,2026-01-07 14:55:05
+21,21,Momo,Completed,cfd01cbd-5f65-48ce-bd21-bc11be9d61ee,2025-09-29 09:04:19
+22,22,Bank_Transfer,Pending,NULL,NULL
+23,23,Bank_Transfer,Pending,NULL,NULL
+24,24,VNPay,Completed,96229348-0f5a-49d3-8e6e-5003214f3f12,2025-09-04 01:36:34
+25,25,Momo,Completed,5463adc7-8fca-4b6a-8fc4-2092f4e559e5,2026-01-14 00:30:13
+26,26,Bank_Transfer,Pending,NULL,NULL
+27,27,Momo,Pending,NULL,NULL
+28,28,VNPay,Completed,5a856750-692a-4139-9f4a-8ca1ab85fd59,2025-09-14 16:08:23
+29,29,Momo,Completed,c012a0ff-f0ed-4303-aa53-c19cdfa4bb9f,2026-06-17 02:11:25
+30,30,Momo,Completed,b8976ec5-ea74-4b18-9e3b-496f6c4596f6,2025-12-02 16:55:05
+31,31,Bank_Transfer,Pending,NULL,NULL
+32,32,VNPay,Completed,99b479d4-49a2-44ae-b7e8-f8e50d2b91ef,2025-08-11 11:21:04
+33,33,Bank_Transfer,Completed,93f277cc-1a85-410d-9a05-7c114ffca6b1,2026-03-13 11:29:21
+34,34,Momo,Completed,a81fdec3-279c-458a-b676-0ce581e5c9f6,2025-08-17 05:07:48
+35,35,COD,Completed,NULL,2025-12-27 05:11:47
+36,36,COD,Completed,NULL,2026-04-28 14:21:56
+37,37,COD,Completed,NULL,2026-06-08 19:28:20
+38,38,COD,Completed,NULL,2026-03-30 13:50:05
+39,39,COD,Pending,NULL,NULL
+40,40,Momo,Pending,NULL,NULL
+41,41,Bank_Transfer,Failed,1bb43332-d8e7-412f-b968-1c817b70c3b8,NULL
+42,42,COD,Completed,NULL,2026-03-08 08:58:43
+43,43,Bank_Transfer,Completed,5e187b24-8e67-4a01-986a-646059a1120e,2025-06-10 06:53:06
+44,44,Bank_Transfer,Completed,92f837d4-4750-4f1d-833a-1f6c1d691fba,2025-12-20 03:27:10
+45,45,Momo,Completed,d85c16bd-6dda-4f8d-8ea6-0f4c39e58ff0,2025-10-29 16:09:47
+46,46,COD,Completed,NULL,2026-02-01 16:19:20
+47,47,Momo,Completed,d1846c39-c476-4556-b97b-e2dd8f9b72ae,2026-02-17 18:39:21
+48,48,Momo,Completed,a487eeab-accb-461a-9d13-23639f294a8b,2025-06-12 20:18:40
+49,49,COD,Completed,NULL,2025-12-30 10:15:37
+50,50,Momo,Completed,edd877c8-9be7-4737-86b8-92318e867f3c,2025-06-11 08:08:22

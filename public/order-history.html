@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lịch sử mua hàng | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[900px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <div class="flex items-center gap-6 mb-8 text-sm">
+    <a href="/profile.html" class="text-on-surface-variant hover:text-primary">Hồ sơ của tôi</a>
+    <a href="/order-history.html" class="text-primary font-semibold border-b-2 border-primary pb-1">Lịch sử mua hàng</a>
+  </div>
+
+  <h1 class="font-display text-3xl font-semibold mb-8">Lịch sử mua hàng</h1>
+  <div id="orders-list" class="space-y-4"></div>
+  <p id="empty-msg" class="hidden text-center text-on-surface-variant py-16">Bạn chưa có đơn hàng nào.</p>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAuth();
+renderNavbar();
+
+const STATUS_LABEL = {
+  Pending_Payment: 'Chờ thanh toán', Processing: 'Đang xử lý', Shipping: 'Đang giao',
+  Completed: 'Hoàn tất', Cancelled: 'Đã hủy', Returned: 'Đã trả hàng',
+};
+const STATUS_COLOR = {
+  Pending_Payment: 'background:#fff3cd;color:#8a6d00;', Processing: '', Shipping: 'background:#cfe8ff;color:#0a5ca8;',
+  Completed: '', Cancelled: 'background:#ffdad6;color:#ba1a1a;', Returned: 'background:#eee;color:#666;',
+};
+
+function orderCard(o) {
+  const canCancel = ['Pending_Payment', 'Processing'].includes(o.order_status);
+  return `
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <p class="font-display font-semibold">Đơn hàng #NTII-${String(o.id).padStart(6, '0')}</p>
+        <p class="text-xs text-on-surface-variant">${new Date(o.created_at).toLocaleString('vi-VN')}</p>
+      </div>
+      <span class="chip" style="${STATUS_COLOR[o.order_status] || ''}">${STATUS_LABEL[o.order_status] || o.order_status}</span>
+    </div>
+    <div class="text-sm text-on-surface-variant mb-3">
+      ${o.items.map(i => `${i.product_name} x${i.quantity}`).join(', ')}
+    </div>
+    ${o.shipping && o.shipping.tracking_number ? `<p class="text-xs text-on-surface-variant mb-2">Mã vận đơn: ${o.shipping.tracking_number} — ${o.shipping.shipping_status}</p>` : ''}
+    <div class="flex items-center justify-between border-t border-outline-variant pt-3">
+      <span class="text-sm text-on-surface-variant">Tổng cộng</span>
+      <span class="font-display font-semibold text-primary">${formatVND(o.final_amount)}</span>
+    </div>
+    ${canCancel ? `<button onclick="cancelOrder(${o.id})" class="btn-ghost w-full mt-3 text-sm py-2">Hủy đơn hàng</button>` : ''}
+  </div>`;
+}
+
+async function load() {
+  try {
+    const orders = await api('/orders');
+    const list = document.getElementById('orders-list');
+    document.getElementById('empty-msg').classList.toggle('hidden', orders.length > 0);
+    list.innerHTML = orders.map(orderCard).join('');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function cancelOrder(id) {
+  if (!confirm('Bạn có chắc muốn hủy đơn hàng này?')) return;
+  try {
+    await api(`/orders/${id}/cancel`, { method: 'PUT' });
+    showToast('Đã hủy đơn hàng.');
+    load();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+load();
+</script>
+</body>
+</html>

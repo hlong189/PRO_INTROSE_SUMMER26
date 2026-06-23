@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bảng điều khiển quản trị | NT-II Ops</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+
+<header class="sticky top-0 z-50 bg-on-surface text-white">
+  <div class="max-w-[1300px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <span class="font-display text-xl font-semibold">NT-II <span class="text-primary-container">Ops</span></span>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="/admin-dashboard.html" class="font-semibold border-b-2 border-primary-container pb-1">Bảng điều khiển</a>
+        <a href="/admin-inventory.html" class="text-white/70 hover:text-white">Quản lý kho</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <a href="/index.html" class="text-white/70 hover:text-white">Xem website →</a>
+      <button onclick="Auth.logout()" class="btn-ghost text-white border-white/40 hover:bg-white/10 py-1.5 px-4">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<section class="max-w-[1300px] mx-auto px-4 md:px-8 py-8 md:py-10">
+  <h1 class="font-display text-3xl font-semibold mb-1">Bảng điều khiển quản trị</h1>
+  <p class="text-on-surface-variant mb-8">Tổng quan hoạt động kinh doanh NT-II</p>
+
+  <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10"></div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display text-lg font-medium">Đơn hàng gần đây</h2>
+        <a href="/admin-inventory.html" class="text-sm text-primary font-semibold">Quản lý kho →</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-2">Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thời gian</th>
+          </tr></thead>
+          <tbody id="recent-orders"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card p-6">
+      <h2 class="font-display text-lg font-medium mb-4">Cảnh báo tồn kho thấp</h2>
+      <div id="low-stock-list" class="space-y-3"></div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAdmin();
+
+const STATUS_LABEL = {
+  Pending_Payment: 'Chờ thanh toán', Processing: 'Đang xử lý', Shipping: 'Đang giao',
+  Completed: 'Hoàn tất', Cancelled: 'Đã hủy', Returned: 'Đã trả hàng',
+};
+
+function statCard(icon, label, value) {
+  return `<div class="card p-5">
+    <span class="material-symbols-outlined text-primary mb-2">${icon}</span>
+    <p class="text-2xl font-display font-semibold">${value}</p>
+    <p class="text-xs text-on-surface-variant text-label-caps mt-1">${label}</p>
+  </div>`;
+}
+
+async function load() {
+  try {
+    const s = await api('/admin/stats');
+    document.getElementById('stats-grid').innerHTML = [
+      statCard('payments', 'Tổng doanh thu', formatVND(s.revenue)),
+      statCard('shopping_bag', 'Tổng đơn hàng', s.totalOrders),
+      statCard('inventory_2', 'Tổng sản phẩm', s.totalProducts),
+      statCard('group', 'Khách hàng', s.totalCustomers),
+    ].join('');
+
+    document.getElementById('recent-orders').innerHTML = s.recentOrders.map(o => `
+      <tr class="border-b border-outline-variant/60">
+        <td class="py-2 font-medium">#NTII-${String(o.id).padStart(6,'0')}</td>
+        <td>${o.full_name}</td>
+        <td>${formatVND(o.final_amount)}</td>
+        <td><span class="chip">${STATUS_LABEL[o.order_status] || o.order_status}</span></td>
+        <td class="text-on-surface-variant text-xs">${new Date(o.created_at).toLocaleString('vi-VN')}</td>
+      </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="5">Chưa có đơn hàng nào.</td></tr>';
+
+    document.getElementById('low-stock-list').innerHTML = s.lowStock.map(p => `
+      <div class="flex items-center justify-between text-sm">
+        <span>${p.name} <span class="text-xs text-on-surface-variant">(${p.sku})</span></span>
+        <span class="font-semibold ${p.stock_quantity === 0 ? 'text-error' : 'text-primary'}">${p.stock_quantity} sp</span>
+      </div>`).join('') || '<p class="text-sm text-on-surface-variant">Tồn kho ổn định.</p>';
+  } catch (err) { showToast(err.message, 'error'); }
+}
+load();
+</script>
+</body>
+</html>

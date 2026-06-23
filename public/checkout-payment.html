@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Phương thức thanh toán | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[700px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <div class="flex items-center justify-center gap-2 mb-10 text-xs text-on-surface-variant">
+    <span>1. Xác nhận thông tin</span><span>—</span><span class="text-primary font-semibold">2. Thanh toán</span><span>—</span><span>3. Hoàn tất</span>
+  </div>
+
+  <h1 class="font-display text-2xl font-semibold mb-2">Chọn phương thức thanh toán</h1>
+  <p class="text-on-surface-variant mb-8 text-sm">Chọn cách bạn muốn thanh toán cho đơn hàng này.</p>
+
+  <form id="payment-form" class="space-y-4 mb-6">
+    <label class="card p-5 flex items-center gap-4 cursor-pointer payment-option">
+      <input type="radio" name="payment" value="COD" checked class="accent-primary w-5 h-5"/>
+      <span class="material-symbols-outlined text-primary">payments</span>
+      <div><p class="font-medium">Thanh toán khi nhận hàng (COD)</p><p class="text-xs text-on-surface-variant">Thanh toán bằng tiền mặt khi nhận hàng</p></div>
+    </label>
+    <label class="card p-5 flex items-center gap-4 cursor-pointer payment-option">
+      <input type="radio" name="payment" value="Bank_Transfer" class="accent-primary w-5 h-5"/>
+      <span class="material-symbols-outlined text-primary">account_balance</span>
+      <div><p class="font-medium">Chuyển khoản ngân hàng</p><p class="text-xs text-on-surface-variant">Chuyển khoản trước khi giao hàng</p></div>
+    </label>
+    <label class="card p-5 flex items-center gap-4 cursor-pointer payment-option">
+      <input type="radio" name="payment" value="VNPay" class="accent-primary w-5 h-5"/>
+      <span class="material-symbols-outlined text-primary">qr_code_2</span>
+      <div><p class="font-medium">Ví điện tử VNPay</p><p class="text-xs text-on-surface-variant">Quét mã QR hoặc thanh toán qua ứng dụng VNPay</p></div>
+    </label>
+    <label class="card p-5 flex items-center gap-4 cursor-pointer payment-option">
+      <input type="radio" name="payment" value="Momo" class="accent-primary w-5 h-5"/>
+      <span class="material-symbols-outlined text-primary">qr_code_2</span>
+      <div><p class="font-medium">Ví điện tử Momo</p><p class="text-xs text-on-surface-variant">Quét mã QR hoặc thanh toán qua ứng dụng Momo</p></div>
+    </label>
+
+    <p id="error-msg" class="text-error text-sm hidden"></p>
+    <button type="submit" id="submit-btn" class="btn-primary w-full">Hoàn tất đặt hàng</button>
+  </form>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAuth();
+renderNavbar();
+
+const checkoutInfo = JSON.parse(sessionStorage.getItem('ntii_checkout') || 'null');
+if (!checkoutInfo) window.location.href = '/checkout-confirm.html';
+
+document.getElementById('payment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('error-msg');
+  const btn = document.getElementById('submit-btn');
+  errEl.classList.add('hidden');
+  btn.disabled = true; btn.textContent = 'Đang xử lý...';
+  const payment_method = document.querySelector('input[name="payment"]:checked').value;
+
+  const items = CartStore.getAll().map(i => ({ product_id: i.product_id, quantity: i.quantity }));
+  if (!items.length) { window.location.href = '/cart.html'; return; }
+
+  try {
+    const order = await api('/orders', {
+      method: 'POST',
+      body: {
+        items,
+        payment_method,
+        recipient_name: checkoutInfo.recipient_name,
+        recipient_phone: checkoutInfo.recipient_phone,
+        province_city: checkoutInfo.province_city,
+        ward: checkoutInfo.ward,
+        specific_address: checkoutInfo.specific_address,
+        voucher_code: checkoutInfo.voucher_code,
+      },
+    });
+    sessionStorage.removeItem('ntii_checkout');
+    CartStore.clear();
+    window.location.href = '/order-success.html?orderId=' + order.id;
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+    btn.disabled = false; btn.textContent = 'Hoàn tất đặt hàng';
+  }
+});
+</script>
+</body>
+</html>

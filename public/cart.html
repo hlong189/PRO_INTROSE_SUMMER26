@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Giỏ hàng | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[1000px] mx-auto px-4 md:px-8 py-8 md:py-14">
+  <h1 class="font-display text-3xl font-semibold mb-8">Giỏ hàng</h1>
+  <div id="cart-content"></div>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+renderNavbar();
+
+const SHIPPING_FEE = 30000;
+const FREE_SHIP_THRESHOLD = 500000;
+function productImage(sku) { return `https://picsum.photos/seed/${sku}/200/200`; }
+
+function emptyState() {
+  return `<div class="text-center py-20">
+    <span class="material-symbols-outlined text-5xl text-on-surface-variant">shopping_bag</span>
+    <p class="text-on-surface-variant mt-4 mb-6">Giỏ hàng của bạn đang trống.</p>
+    <a href="/products.html" class="btn-primary">Khám phá sản phẩm</a>
+  </div>`;
+}
+
+function render() {
+  const el = document.getElementById('cart-content');
+  const items = CartStore.getAll();
+  if (!items.length) { el.innerHTML = emptyState(); return; }
+  const subtotal = CartStore.subtotal();
+  const shippingFee = subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
+  const total = subtotal + shippingFee;
+
+  el.innerHTML = `
+    <div class="space-y-4 mb-8">
+      ${items.map(item => `
+        <div class="card p-4 flex gap-4 items-center">
+          <img src="${productImage(item.sku)}" class="w-20 h-20 object-cover rounded"/>
+          <div class="flex-1">
+            <a href="/product-detail.html?sku=${item.sku}" class="font-display font-medium hover:text-primary">${item.name}</a>
+            <p class="text-primary font-semibold mt-1">${formatVND(item.price)}</p>
+            ${item.quantity >= item.stock_quantity ? '<p class="text-xs text-error">Đã đạt số lượng tối đa trong kho</p>' : ''}
+          </div>
+          <div class="flex items-center border border-outline-variant rounded">
+            <button onclick="updateQty(${item.product_id}, ${item.quantity - 1})" class="w-8 h-8 flex items-center justify-center">−</button>
+            <span class="w-8 text-center text-sm">${item.quantity}</span>
+            <button onclick="updateQty(${item.product_id}, ${item.quantity + 1})" class="w-8 h-8 flex items-center justify-center">+</button>
+          </div>
+          <button onclick="removeItem(${item.product_id})" class="material-symbols-outlined text-on-surface-variant hover:text-error">delete</button>
+        </div>`).join('')}
+    </div>
+
+    <div class="card p-6">
+      <div class="flex justify-between text-sm mb-2"><span class="text-on-surface-variant">Tạm tính</span><span>${formatVND(subtotal)}</span></div>
+      <div class="flex justify-between text-sm mb-4"><span class="text-on-surface-variant">Phí vận chuyển</span><span>${shippingFee === 0 ? 'Miễn phí' : formatVND(shippingFee)}</span></div>
+      <div class="flex justify-between font-display text-lg font-semibold border-t border-outline-variant pt-4 mb-6"><span>Tổng cộng</span><span class="text-primary">${formatVND(total)}</span></div>
+      <button onclick="proceedToCheckout()" class="btn-primary w-full text-center block">Tiến hành đặt hàng</button>
+    </div>`;
+}
+
+function updateQty(productId, qty) {
+  CartStore.setQuantity(productId, qty);
+  render();
+}
+
+function removeItem(productId) {
+  CartStore.remove(productId);
+  render();
+}
+
+function proceedToCheckout() {
+  if (!Auth.isLoggedIn()) {
+    window.location.href = '/login.html?next=' + encodeURIComponent('/checkout-confirm.html');
+    return;
+  }
+  window.location.href = '/checkout-confirm.html';
+}
+
+render();
+</script>
+</body>
+</html>

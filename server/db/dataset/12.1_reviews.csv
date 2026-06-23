@@ -1,0 +1,51 @@
+id,product_id,user_id,rating,comment,parent_id,is_hidden,created_at
+1,36,32,4,Love the texture and the scent is very mild. Highly recommend.,NULL,1,2025-10-04 18:43:51
+2,12,14,3,Decent quality but a bit pricey for the size.,NULL,0,2025-12-21 13:27:56
+3,13,33,5,Packaging is nice and the product works as described.,NULL,0,2025-12-04 17:53:33
+4,14,21,5,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-05-16 19:35:18
+5,7,40,3,Decent quality but a bit pricey for the size.,NULL,0,2025-11-10 08:04:48
+6,17,48,5,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2026-01-27 16:20:27
+7,39,28,1,"Didn't work for me, no noticeable difference after a month.",NULL,0,2026-02-19 16:57:39
+8,30,45,5,Love the texture and the scent is very mild. Highly recommend.,NULL,0,2026-03-25 07:59:01
+9,40,43,3,"Average product, took a while to see any results.",NULL,0,2025-08-27 18:09:51
+10,20,9,5,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-04-02 00:58:39
+11,27,44,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2025-12-02 18:06:59
+12,41,40,4,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2026-03-14 07:56:25
+13,36,13,1,"Caused some irritation on my sensitive skin, had to stop using it.",NULL,0,2025-08-30 05:20:20
+14,40,5,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2025-07-10 11:00:16
+15,25,41,4,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-01-14 23:08:02
+16,27,33,4,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2025-08-07 20:13:35
+17,19,4,4,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-01-31 12:33:21
+18,37,37,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2025-08-19 16:53:00
+19,50,40,4,Love the texture and the scent is very mild. Highly recommend.,NULL,0,2025-11-26 05:04:48
+20,49,33,4,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2025-12-18 20:24:34
+21,20,4,5,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2025-11-19 02:39:12
+22,29,9,2,"Caused some irritation on my sensitive skin, had to stop using it.",NULL,0,2025-10-06 18:10:40
+23,45,26,5,Packaging is nice and the product works as described.,NULL,0,2026-02-28 17:43:58
+24,40,10,4,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-05-18 16:19:42
+25,37,26,5,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2026-02-23 12:47:50
+26,46,22,4,Love the texture and the scent is very mild. Highly recommend.,NULL,0,2025-10-18 13:29:54
+27,44,8,1,Packaging arrived damaged and the product leaked.,NULL,0,2026-04-24 01:03:52
+28,18,47,3,"It's okay, nothing special but does the job.",NULL,0,2026-06-08 02:07:12
+29,46,24,5,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-04-28 11:07:43
+30,32,11,2,"Didn't work for me, no noticeable difference after a month.",NULL,0,2025-10-19 02:18:21
+31,29,6,4,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2026-06-13 13:02:27
+32,33,21,3,"Average product, took a while to see any results.",NULL,0,2026-06-12 10:52:15
+33,21,43,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2026-05-03 09:08:39
+34,47,35,2,"Caused some irritation on my sensitive skin, had to stop using it.",NULL,0,2026-04-03 12:53:05
+35,35,29,5,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2025-12-20 14:14:40
+36,18,24,2,"Didn't work for me, no noticeable difference after a month.",NULL,0,2025-11-14 21:47:12
+37,37,37,4,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-06-18 23:48:21
+38,3,8,3,"It's okay, nothing special but does the job.",NULL,0,2026-05-27 16:18:36
+39,11,33,4,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2025-12-19 21:03:32
+40,42,23,5,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-06-12 04:08:18
+41,17,7,5,Love the texture and the scent is very mild. Highly recommend.,NULL,0,2026-03-15 17:58:17
+42,41,23,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2026-04-26 00:57:16
+43,46,8,5,"Great product, my skin feels so much smoother after a week of use!",NULL,0,2026-01-07 21:50:28
+44,15,39,5,Packaging is nice and the product works as described.,NULL,0,2025-07-10 08:14:28
+45,8,32,5,Love the texture and the scent is very mild. Highly recommend.,NULL,0,2026-01-08 06:10:10
+46,6,8,5,Noticed visible improvement in just a few days. Worth the price.,NULL,0,2025-11-26 11:36:13
+47,25,10,2,"Caused some irritation on my sensitive skin, had to stop using it.",NULL,0,2026-03-26 17:03:20
+48,37,1,5,Packaging is nice and the product works as described.,NULL,0,2025-09-08 11:21:27
+49,41,11,4,Absorbs quickly and doesn't feel greasy at all. Will repurchase.,NULL,0,2026-03-02 23:55:30
+50,6,8,3,"It's okay, nothing special but does the job.",NULL,0,2025-08-23 13:35:20

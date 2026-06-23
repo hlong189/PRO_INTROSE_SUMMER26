@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Đặt hàng thành công | NT-II</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: {
+  primary: '#7c5454', 'on-primary': '#ffffff', 'primary-container': '#d4a3a3',
+  secondary: '#675c56', 'secondary-container': '#ecddd4',
+  background: '#f9f9f9', surface: '#ffffff', 'on-surface': '#1a1c1c', 'on-surface-variant': '#504444',
+  outline: '#827473', 'outline-variant': '#d4c2c2', error: '#ba1a1a',
+}, fontFamily: { display: ['Playfair Display','serif'], sans: ['Hanken Grotesk','sans-serif'] } } } };
+</script>
+<link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body class="bg-background text-on-surface font-sans">
+<div id="navbar-mount"></div>
+
+<section class="max-w-[700px] mx-auto px-4 md:px-8 py-14 md:py-20">
+  <div class="flex items-center justify-center gap-2 mb-10 text-xs text-on-surface-variant">
+    <span>1. Xác nhận thông tin</span><span>—</span><span>2. Thanh toán</span><span>—</span><span class="text-primary font-semibold">3. Hoàn tất</span>
+  </div>
+
+  <div class="text-center mb-10">
+    <div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center mx-auto mb-5">
+      <span class="material-symbols-outlined text-primary text-3xl">check</span>
+    </div>
+    <h1 class="font-display text-3xl font-semibold mb-2">Đặt hàng thành công!</h1>
+    <p class="text-on-surface-variant" id="order-ref"></p>
+    <p class="text-sm text-primary mt-2" id="points-note"></p>
+  </div>
+
+  <div id="order-detail" class="card p-6 mb-8"></div>
+
+  <div class="flex flex-col sm:flex-row gap-3">
+    <a href="/order-history.html" class="btn-ghost flex-1 text-center">Xem lịch sử mua hàng</a>
+    <a href="/products.html" class="btn-primary flex-1 text-center">Tiếp tục mua sắm</a>
+  </div>
+</section>
+
+<script src="/js/api.js"></script>
+<script>
+requireAuth();
+renderNavbar();
+
+const STATUS_LABEL = {
+  Pending_Payment: 'Chờ thanh toán', Processing: 'Đang xử lý', Shipping: 'Đang giao',
+  Completed: 'Hoàn tất', Cancelled: 'Đã hủy', Returned: 'Đã trả hàng',
+};
+const PAYMENT_STATUS_LABEL = { Pending: 'Chờ thanh toán', Completed: 'Đã thanh toán', Failed: 'Thất bại', Refunded: 'Đã hoàn tiền' };
+
+async function load() {
+  const orderId = new URLSearchParams(window.location.search).get('orderId');
+  if (!orderId) { window.location.href = '/index.html'; return; }
+  try {
+    const order = await api('/orders/' + orderId);
+    document.getElementById('order-ref').textContent = `Mã đơn hàng #NTII-${String(order.id).padStart(6, '0')} đã được ghi nhận vào lịch sử mua hàng của bạn.`;
+    document.getElementById('order-detail').innerHTML = `
+      <h2 class="text-label-caps text-on-surface-variant mb-4">Chi tiết đơn hàng</h2>
+      <div class="space-y-2 mb-4">
+        ${order.items.map(i => `
+          <div class="flex justify-between text-sm">
+            <span>${i.product_name} <span class="text-on-surface-variant">x${i.quantity}</span></span>
+            <span>${formatVND(i.price_at_purchase * i.quantity)}</span>
+          </div>`).join('')}
+      </div>
+      <div class="border-t border-outline-variant pt-4 space-y-1">
+        <div class="flex justify-between text-sm"><span class="text-on-surface-variant">Tạm tính</span><span>${formatVND(order.subtotal_amount)}</span></div>
+        ${order.discount_amount > 0 ? `<div class="flex justify-between text-sm"><span class="text-on-surface-variant">Giảm giá</span><span class="text-primary">−${formatVND(order.discount_amount)}</span></div>` : ''}
+        <div class="flex justify-between text-sm"><span class="text-on-surface-variant">Phí vận chuyển</span><span>${Number(order.shipping_fee) === 0 ? 'Miễn phí' : formatVND(order.shipping_fee)}</span></div>
+        <div class="flex justify-between font-display font-semibold text-lg pt-2"><span>Tổng cộng</span><span class="text-primary">${formatVND(order.final_amount)}</span></div>
+      </div>
+      <div class="border-t border-outline-variant mt-4 pt-4 text-sm space-y-1 text-on-surface-variant">
+        <p><strong class="text-on-surface">Trạng thái đơn hàng:</strong> <span class="chip">${STATUS_LABEL[order.order_status] || order.order_status}</span></p>
+        <p><strong class="text-on-surface">Thanh toán:</strong> ${order.payment.payment_method} — ${PAYMENT_STATUS_LABEL[order.payment.payment_status] || order.payment.payment_status}</p>
+        <p><strong class="text-on-surface">Vận chuyển:</strong> ${order.shipping.carrier_name} (dự kiến ${new Date(order.shipping.estimated_delivery_date).toLocaleDateString('vi-VN')})</p>
+      </div>`;
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+load();
+</script>
+</body>
+</html>

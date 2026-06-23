@@ -1,0 +1,27 @@
+{
+  "name": "ntii-skincare-shop",
+  "version": "1.0.0",
+  "description": "NT-II - He thong ban my pham online Fullstack (Node/Express/MySQL)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "init-db": "node server/db/init-schema.js",
+    "seed": "node server/db/seed.js",
+    "import-dataset": "node server/db/import-dataset.js",
+    "ensure-demo-users": "node server/db/ensure-demo-users.js",
+    "setup": "npm run init-db && npm run seed",
+    "setup-real-data": "npm run init-db && npm run import-dataset && npm run ensure-demo-users",
+    "reset-db": "node server/db/reset-db.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.0"
+  }
+}

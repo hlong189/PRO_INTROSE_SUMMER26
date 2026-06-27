@@ -105,6 +105,7 @@ router.get('/products/:sku', async (req, res) => {
 router.get('/products/:sku/reviews', async (req, res) => {
   const product = await get('SELECT id FROM products WHERE sku = ?', [req.params.sku]);
   if (!product) return res.status(404).json({ error: 'Không tìm thấy sản phẩm.' });
+<<<<<<< HEAD
   const reviews = await query(
     `SELECT r.id, r.rating, r.comment, r.created_at, r.parent_id, u.full_name
      FROM reviews r JOIN users u ON u.id = r.user_id
@@ -123,6 +124,63 @@ router.post('/products/:sku/reviews', verifyToken, async (req, res) => {
   const [result] = await pool.query(
     'INSERT INTO reviews (product_id, user_id, rating, comment, parent_id) VALUES (?, ?, ?, ?, ?)',
     [product.id, req.user.id, rating, comment || null, parent_id || null]
+=======
+  const rows = await query(
+    `SELECT r.id, r.rating, r.comment, r.created_at, r.parent_id, u.full_name, ro.role_name
+     FROM reviews r JOIN users u ON u.id = r.user_id JOIN roles ro ON ro.id = u.role_id
+     WHERE r.product_id = ? AND r.is_hidden = 0 ORDER BY r.created_at ASC`,
+    [product.id]
+  );
+  // Gắn các phản hồi (parent_id) vào đúng đánh giá gốc
+  const topLevel = rows.filter((r) => !r.parent_id);
+  const replies = rows.filter((r) => r.parent_id);
+  const result = topLevel.map((r) => ({
+    ...r,
+    replies: replies.filter((rep) => rep.parent_id === r.id),
+  })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  res.json(result);
+});
+
+// GET /api/products/:sku/can-review  - kiểm tra khách đã mua & nhận hàng sản phẩm này chưa
+router.get('/products/:sku/can-review', verifyToken, async (req, res) => {
+  const product = await get('SELECT id FROM products WHERE sku = ?', [req.params.sku]);
+  if (!product) return res.status(404).json({ error: 'Không tìm thấy sản phẩm.' });
+  const purchased = await get(
+    `SELECT oi.id FROM order_items oi JOIN orders o ON o.id = oi.order_id
+     WHERE o.user_id = ? AND oi.product_id = ? AND o.order_status = 'Completed' LIMIT 1`,
+    [req.user.id, product.id]
+  );
+  const alreadyReviewed = await get('SELECT id FROM reviews WHERE product_id = ? AND user_id = ? AND parent_id IS NULL', [product.id, req.user.id]);
+  res.json({ canReview: !!purchased, alreadyReviewed: !!alreadyReviewed });
+});
+
+// POST /api/products/:sku/reviews  (yêu cầu đăng nhập + đã mua và nhận hàng sản phẩm này)
+router.post('/products/:sku/reviews', verifyToken, async (req, res) => {
+  const { rating, comment } = req.body;
+  if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'Vui lòng chọn số sao đánh giá (từ 1 đến 5).' });
+  }
+  if (!comment || !comment.trim()) {
+    return res.status(400).json({ error: 'Vui lòng nhập nội dung đánh giá.' });
+  }
+  const product = await get('SELECT id FROM products WHERE sku = ?', [req.params.sku]);
+  if (!product) return res.status(404).json({ error: 'Không tìm thấy sản phẩm.' });
+
+  // Khắc phục lỗi "sản phẩm không mua vẫn đánh giá được": chỉ cho đánh giá nếu đã có đơn hàng
+  // chứa sản phẩm này và đơn đã ở trạng thái Hoàn tất (đã giao hàng).
+  const purchased = await get(
+    `SELECT oi.id FROM order_items oi JOIN orders o ON o.id = oi.order_id
+     WHERE o.user_id = ? AND oi.product_id = ? AND o.order_status = 'Completed' LIMIT 1`,
+    [req.user.id, product.id]
+  );
+  if (!purchased) {
+    return res.status(403).json({ error: 'Bạn cần mua và nhận hàng sản phẩm này trước khi có thể đánh giá.' });
+  }
+
+  const [result] = await pool.query(
+    'INSERT INTO reviews (product_id, user_id, rating, comment, parent_id) VALUES (?, ?, ?, ?, NULL)',
+    [product.id, req.user.id, rating, comment.trim()]
+>>>>>>> 67673ed (Nội dung cập nhật)
   );
   res.status(201).json({ id: result.insertId, message: 'Đã gửi đánh giá của bạn.' });
 });

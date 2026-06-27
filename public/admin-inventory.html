@@ -39,6 +39,7 @@ tailwind.config = { theme: { extend: { colors: {
 
 <section class="max-w-[1300px] mx-auto px-4 md:px-8 py-8 md:py-10">
   <h1 class="font-display text-3xl font-semibold mb-1">Quản lý kho & tồn kho</h1>
+<<<<<<< HEAD
   <p class="text-on-surface-variant mb-6">Quản lý sản phẩm, nhập kho theo lô hàng, đơn hàng và nhập dữ liệu vào database.</p>
 
   <!-- Tabs -->
@@ -46,6 +47,17 @@ tailwind.config = { theme: { extend: { colors: {
     <button data-tab="products" onclick="switchTab('products')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary">Sản phẩm</button>
     <button data-tab="batches" onclick="switchTab('batches')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-on-surface-variant">Nhập kho (Lô hàng)</button>
     <button data-tab="orders" onclick="switchTab('orders')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-on-surface-variant">Đơn hàng</button>
+=======
+  <p class="text-on-surface-variant mb-6">Quản lý sản phẩm, nhập kho, đơn hàng, khuyến mãi, khách hàng và đánh giá.</p>
+
+  <div class="flex gap-2 mb-6 border-b border-outline-variant overflow-x-auto">
+    <button data-tab="products" onclick="switchTab('products')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-primary text-primary">Sản phẩm</button>
+    <button data-tab="batches" onclick="switchTab('batches')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-on-surface-variant">Nhập kho</button>
+    <button data-tab="orders" onclick="switchTab('orders')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-on-surface-variant">Đơn hàng</button>
+    <button data-tab="vouchers" onclick="switchTab('vouchers')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-on-surface-variant">Khuyến mãi</button>
+    <button data-tab="users" onclick="switchTab('users')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-on-surface-variant">Khách hàng</button>
+    <button data-tab="reviews" onclick="switchTab('reviews')" class="tab-btn px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 border-transparent text-on-surface-variant">Đánh giá</button>
+>>>>>>> 67673ed (Nội dung cập nhật)
   </div>
 
   <!-- TAB: Products -->
@@ -72,6 +84,10 @@ tailwind.config = { theme: { extend: { colors: {
 
   <!-- TAB: Batches -->
   <div id="tab-batches" class="hidden">
+<<<<<<< HEAD
+=======
+    <div id="reorder-suggestions" class="mb-6"></div>
+>>>>>>> 67673ed (Nội dung cập nhật)
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
       <p class="text-sm text-on-surface-variant">Mỗi lần nhập kho tạo 1 lô hàng gắn với nhà cung cấp — số lượng sẽ tự động cộng vào tồn kho sản phẩm.</p>
       <button onclick="openBatchForm()" class="btn-primary whitespace-nowrap">+ Nhập kho</button>
@@ -101,6 +117,47 @@ tailwind.config = { theme: { extend: { colors: {
       </table>
     </div>
   </div>
+<<<<<<< HEAD
+=======
+
+  <!-- TAB: Vouchers -->
+  <div id="tab-vouchers" class="hidden">
+    <div class="flex justify-end mb-6">
+      <button onclick="openVoucherForm()" class="btn-primary">+ Tạo khuyến mãi</button>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-3 px-4">Mã</th><th>Loại giảm</th><th>Giá trị</th><th>Đơn tối thiểu</th><th>Hết hạn</th><th>Trạng thái</th><th class="px-4">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="voucher-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Users -->
+  <div id="tab-users" class="hidden">
+    <p class="text-sm text-on-surface-variant mb-6">Khóa tài khoản nếu khách hàng vi phạm chính sách (spam đơn, gian lận voucher...).</p>
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-on-surface-variant border-b border-outline-variant">
+            <th class="py-3 px-4">Khách hàng</th><th>Email</th><th>SĐT</th><th>Hạng</th><th>Điểm</th><th>Trạng thái</th><th class="px-4">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="user-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Reviews -->
+  <div id="tab-reviews" class="hidden">
+    <p class="text-sm text-on-surface-variant mb-6">Phản hồi đánh giá của khách hàng để xây dựng uy tín thương hiệu.</p>
+    <div id="review-rows" class="space-y-4"></div>
+  </div>
+>>>>>>> 67673ed (Nội dung cập nhật)
 </section>
 
 <!-- Dialog: Thêm / Sửa sản phẩm -->
@@ -110,6 +167,7 @@ tailwind.config = { theme: { extend: { colors: {
     <form id="product-form" class="space-y-4">
       <input type="hidden" id="p-id"/>
       <div class="grid grid-cols-2 gap-4">
+<<<<<<< HEAD
         <div><label class="text-label-caps text-on-surface-variant">SKU</label><input id="p-sku" required class="input-field"/></div>
         <div><label class="text-label-caps text-on-surface-variant">Tên sản phẩm</label><input id="p-name" required class="input-field"/></div>
       </div>
@@ -121,6 +179,30 @@ tailwind.config = { theme: { extend: { colors: {
         <div><label class="text-label-caps text-on-surface-variant">Giá bán (đ)</label><input id="p-price" type="number" required class="input-field"/></div>
         <div><label class="text-label-caps text-on-surface-variant">Giá gốc (đ)</label><input id="p-original-price" type="number" required class="input-field"/></div>
         <div><label class="text-label-caps text-on-surface-variant">Tồn kho</label><input id="p-stock" type="number" class="input-field"/></div>
+=======
+        <div>
+          <label class="text-label-caps text-on-surface-variant">SKU <span class="text-xs">(tự gợi ý theo danh mục)</span></label>
+          <input id="p-sku" required class="input-field"/>
+        </div>
+        <div><label class="text-label-caps text-on-surface-variant">Tên sản phẩm</label><input id="p-name" required class="input-field"/></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-caps text-on-surface-variant">Danh mục</label>
+          <input id="p-category" required list="category-options" class="input-field" oninput="suggestSku()"/>
+          <datalist id="category-options"></datalist>
+        </div>
+        <div>
+          <label class="text-label-caps text-on-surface-variant">Nhãn hàng</label>
+          <input id="p-brand" required list="brand-options" class="input-field"/>
+          <datalist id="brand-options"></datalist>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">Giá bán (đ)</label><input id="p-price" type="number" min="1" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Giá gốc (đ)</label><input id="p-original-price" type="number" min="1" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Tồn kho</label><input id="p-stock" type="number" min="0" class="input-field"/></div>
+>>>>>>> 67673ed (Nội dung cập nhật)
       </div>
       <div><label class="text-label-caps text-on-surface-variant">Thành phần</label><textarea id="p-ingredients" rows="2" class="input-field"></textarea></div>
       <div><label class="text-label-caps text-on-surface-variant">Hướng dẫn sử dụng</label><textarea id="p-usage" rows="2" class="input-field"></textarea></div>
@@ -151,10 +233,17 @@ tailwind.config = { theme: { extend: { colors: {
           <button type="button" onclick="createSupplier()" class="btn-ghost whitespace-nowrap">Tạo</button>
         </div>
       </div>
+<<<<<<< HEAD
       <div><label class="text-label-caps text-on-surface-variant">Mã lô hàng</label><input id="b-code" required class="input-field" placeholder="LOT-XXXX-01"/></div>
       <div class="grid grid-cols-2 gap-4">
         <div><label class="text-label-caps text-on-surface-variant">Số lượng nhập</label><input id="b-quantity" type="number" required class="input-field"/></div>
         <div><label class="text-label-caps text-on-surface-variant">Giá nhập (đ)</label><input id="b-price" type="number" required class="input-field"/></div>
+=======
+      <div><label class="text-label-caps text-on-surface-variant">Mã lô hàng (phải duy nhất)</label><input id="b-code" required class="input-field" placeholder="LOT-XXXX-01"/></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-label-caps text-on-surface-variant">Số lượng nhập</label><input id="b-quantity" type="number" min="1" required class="input-field"/></div>
+        <div><label class="text-label-caps text-on-surface-variant">Giá nhập (đ)</label><input id="b-price" type="number" min="1" required class="input-field"/></div>
+>>>>>>> 67673ed (Nội dung cập nhật)
       </div>
       <div><label class="text-label-caps text-on-surface-variant">Ngày hết hạn</label><input id="b-expiry" type="date" required class="input-field"/></div>
       <p id="batch-error" class="text-error text-sm hidden"></p>
@@ -166,13 +255,46 @@ tailwind.config = { theme: { extend: { colors: {
   </div>
 </div>
 
+<<<<<<< HEAD
+=======
+<!-- Dialog: Voucher -->
+<div id="voucher-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+  <div class="card bg-white w-full max-w-lg p-6">
+    <h2 class="font-display text-xl font-semibold mb-4">Tạo khuyến mãi theo chiến dịch</h2>
+    <form id="voucher-form" class="space-y-4">
+      <div><label class="text-label-caps text-on-surface-variant">Mã voucher</label><input id="v-code" required class="input-field" placeholder="SALE2026"/></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-caps text-on-surface-variant">Loại giảm giá</label>
+          <select id="v-type" class="input-field">
+            <option value="Percentage">Theo phần trăm (%)</option>
+            <option value="Fixed_Amount">Số tiền cố định (đ)</option>
+          </select>
+        </div>
+        <div><label class="text-label-caps text-on-surface-variant">Giá trị giảm</label><input id="v-value" type="number" min="1" required class="input-field"/></div>
+      </div>
+      <div><label class="text-label-caps text-on-surface-variant">Giá trị đơn hàng tối thiểu (đ)</label><input id="v-min" type="number" min="0" value="0" class="input-field"/></div>
+      <div><label class="text-label-caps text-on-surface-variant">Ngày kết thúc chiến dịch</label><input id="v-end" type="datetime-local" required class="input-field"/></div>
+      <p id="voucher-error" class="text-error text-sm hidden"></p>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="document.getElementById('voucher-dialog').classList.add('hidden')" class="btn-ghost flex-1">Hủy</button>
+        <button type="submit" class="btn-primary flex-1">Tạo khuyến mãi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 <!-- Dialog: Nhập dữ liệu CSV -->
 <div id="import-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
   <div class="card bg-white w-full max-w-lg p-6">
     <h2 class="font-display text-xl font-semibold mb-2">Nhập dữ liệu sản phẩm từ CSV</h2>
     <p class="text-sm text-on-surface-variant mb-4">
       Cột CSV cần có: <code class="text-xs bg-secondary-container/40 px-1 rounded">sku, name, category_name, brand_name, price, original_price, stock_quantity, ingredients, usage_instructions</code>.
+<<<<<<< HEAD
       Sản phẩm trùng <code>sku</code> sẽ được cập nhật, sản phẩm mới sẽ được thêm thẳng vào database.
+=======
+>>>>>>> 67673ed (Nội dung cập nhật)
     </p>
     <input type="file" id="csv-file" accept=".csv" class="input-field mb-4"/>
     <p id="import-result" class="text-sm mb-4"></p>
@@ -183,15 +305,37 @@ tailwind.config = { theme: { extend: { colors: {
   </div>
 </div>
 
+<<<<<<< HEAD
+=======
+<!-- Dialog: Phản hồi đánh giá -->
+<div id="reply-dialog" class="hidden fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+  <div class="card bg-white w-full max-w-md p-6">
+    <h2 class="font-display text-lg font-semibold mb-4">Phản hồi đánh giá khách hàng</h2>
+    <textarea id="reply-comment" rows="3" class="input-field mb-4" placeholder="Cảm ơn quý khách đã..."></textarea>
+    <div class="flex gap-3">
+      <button onclick="document.getElementById('reply-dialog').classList.add('hidden')" class="btn-ghost flex-1">Hủy</button>
+      <button onclick="submitReply()" class="btn-primary flex-1">Gửi phản hồi</button>
+    </div>
+  </div>
+</div>
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 <script src="/js/api.js"></script>
 <script>
 requireAdmin();
 
 let allProducts = [];
 let allSuppliers = [];
+<<<<<<< HEAD
 
 function switchTab(tab) {
   ['products', 'batches', 'orders'].forEach(t => {
+=======
+let replyingToId = null;
+
+function switchTab(tab) {
+  ['products', 'batches', 'orders', 'vouchers', 'users', 'reviews'].forEach(t => {
+>>>>>>> 67673ed (Nội dung cập nhật)
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
     const btn = document.querySelector(`.tab-btn[data-tab="${t}"]`);
     btn.classList.toggle('border-primary', t === tab);
@@ -199,8 +343,16 @@ function switchTab(tab) {
     btn.classList.toggle('border-transparent', t !== tab);
     btn.classList.toggle('text-on-surface-variant', t !== tab);
   });
+<<<<<<< HEAD
   if (tab === 'batches') loadBatches();
   if (tab === 'orders') loadOrders();
+=======
+  if (tab === 'batches') { loadBatches(); loadReorderSuggestions(); }
+  if (tab === 'orders') loadOrders();
+  if (tab === 'vouchers') loadVouchers();
+  if (tab === 'users') loadUsers();
+  if (tab === 'reviews') loadReviews();
+>>>>>>> 67673ed (Nội dung cập nhật)
 }
 
 // ---------- Products ----------
@@ -215,7 +367,11 @@ function renderTable() {
   const q = document.getElementById('search-input').value.toLowerCase();
   const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
   document.getElementById('product-rows').innerHTML = filtered.map(p => `
+<<<<<<< HEAD
     <tr class="border-b border-outline-variant/60">
+=======
+    <tr class="border-b border-outline-variant/60 ${!p.is_active ? 'opacity-60' : ''}">
+>>>>>>> 67673ed (Nội dung cập nhật)
       <td class="py-3 px-4">
         <p class="font-medium">${p.name}</p>
         <p class="text-xs text-on-surface-variant">${p.sku}</p>
@@ -231,9 +387,17 @@ function renderTable() {
         </div>
       </td>
       <td>${statusBadge(p)}</td>
+<<<<<<< HEAD
       <td class="px-4">
         <button onclick="editProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary" title="Sửa">edit</button>
         <button onclick="deleteProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-error" title="Xóa">delete</button>
+=======
+      <td class="px-4 whitespace-nowrap">
+        <button onclick="editProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-primary" title="Sửa">edit</button>
+        ${p.is_active
+          ? `<button onclick="deleteProduct(${p.id})" class="material-symbols-outlined text-sm text-on-surface-variant hover:text-error" title="Xóa/Ẩn">delete</button>`
+          : `<button onclick="restoreProduct(${p.id})" class="material-symbols-outlined text-sm text-primary" title="Hiện lại">visibility</button>`}
+>>>>>>> 67673ed (Nội dung cập nhật)
       </td>
     </tr>`).join('');
 }
@@ -253,10 +417,27 @@ async function adjustStock(id, delta) {
   } catch (err) { showToast(err.message, 'error'); }
 }
 
+<<<<<<< HEAD
+=======
+async function suggestSku() {
+  const category = document.getElementById('p-category').value.trim();
+  const skuField = document.getElementById('p-sku');
+  if (!category || skuField.dataset.manual === '1') return;
+  try {
+    const result = await api('/admin/next-sku?category=' + encodeURIComponent(category));
+    skuField.value = result.sku;
+  } catch (err) { /* ignore */ }
+}
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 function openProductForm() {
   document.getElementById('dialog-title').textContent = 'Thêm sản phẩm';
   document.getElementById('product-form').reset();
   document.getElementById('p-id').value = '';
+<<<<<<< HEAD
+=======
+  document.getElementById('p-sku').dataset.manual = '0';
+>>>>>>> 67673ed (Nội dung cập nhật)
   document.getElementById('form-error').classList.add('hidden');
   document.getElementById('product-dialog').classList.remove('hidden');
 }
@@ -267,6 +448,10 @@ function editProduct(id) {
   document.getElementById('dialog-title').textContent = 'Sửa sản phẩm';
   document.getElementById('p-id').value = p.id;
   document.getElementById('p-sku').value = p.sku;
+<<<<<<< HEAD
+=======
+  document.getElementById('p-sku').dataset.manual = '1';
+>>>>>>> 67673ed (Nội dung cập nhật)
   document.getElementById('p-name').value = p.name;
   document.getElementById('p-category').value = p.category_name;
   document.getElementById('p-brand').value = p.brand_name;
@@ -280,7 +465,12 @@ function editProduct(id) {
 }
 
 async function deleteProduct(id) {
+<<<<<<< HEAD
   if (!confirm('Bạn có chắc muốn xóa sản phẩm này khỏi database?')) return;
+=======
+  const ok = await confirmModal('Bạn có chắc muốn xóa sản phẩm này? Nếu sản phẩm đã từng được giao dịch, hệ thống sẽ ẩn thay vì xóa hẳn.', { danger: true, confirmText: 'Xóa sản phẩm' });
+  if (!ok) return;
+>>>>>>> 67673ed (Nội dung cập nhật)
   try {
     const result = await api(`/admin/products/${id}`, { method: 'DELETE' });
     showToast(result.message);
@@ -288,19 +478,45 @@ async function deleteProduct(id) {
   } catch (err) { showToast(err.message, 'error'); }
 }
 
+<<<<<<< HEAD
+=======
+async function restoreProduct(id) {
+  try {
+    await api(`/admin/products/${id}/visibility`, { method: 'PUT', body: { is_active: true } });
+    showToast('Đã hiện lại sản phẩm trên cửa hàng.');
+    loadProducts();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 document.getElementById('product-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errEl = document.getElementById('form-error');
   errEl.classList.add('hidden');
   const id = document.getElementById('p-id').value;
+<<<<<<< HEAD
+=======
+  const price = Number(document.getElementById('p-price').value);
+  const original_price = Number(document.getElementById('p-original-price').value);
+  const stock_quantity = Number(document.getElementById('p-stock').value || 0);
+
+  if (price <= 0) { errEl.textContent = 'Giá bán phải lớn hơn 0.'; errEl.classList.remove('hidden'); return; }
+  if (original_price <= 0) { errEl.textContent = 'Giá gốc phải lớn hơn 0.'; errEl.classList.remove('hidden'); return; }
+  if (stock_quantity < 0) { errEl.textContent = 'Tồn kho không được là số âm.'; errEl.classList.remove('hidden'); return; }
+
+>>>>>>> 67673ed (Nội dung cập nhật)
   const body = {
     sku: document.getElementById('p-sku').value,
     name: document.getElementById('p-name').value,
     category_name: document.getElementById('p-category').value,
     brand_name: document.getElementById('p-brand').value,
+<<<<<<< HEAD
     price: Number(document.getElementById('p-price').value),
     original_price: Number(document.getElementById('p-original-price').value),
     stock_quantity: Number(document.getElementById('p-stock').value || 0),
+=======
+    price, original_price, stock_quantity,
+>>>>>>> 67673ed (Nội dung cập nhật)
     ingredients: document.getElementById('p-ingredients').value,
     usage_instructions: document.getElementById('p-usage').value,
   };
@@ -310,12 +526,26 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
     showToast('Đã lưu sản phẩm vào database');
     closeProductForm();
     loadProducts();
+<<<<<<< HEAD
+=======
+    loadCategoryBrandOptions();
+>>>>>>> 67673ed (Nội dung cập nhật)
   } catch (err) {
     errEl.textContent = err.message;
     errEl.classList.remove('hidden');
   }
 });
 
+<<<<<<< HEAD
+=======
+async function loadCategoryBrandOptions() {
+  const cats = await api('/categories', { auth: false });
+  document.getElementById('category-options').innerHTML = cats.map(c => `<option value="${c.category_name}">`).join('');
+  const brands = await api('/brands', { auth: false });
+  document.getElementById('brand-options').innerHTML = brands.map(b => `<option value="${b.brand_name}">`).join('');
+}
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 async function doImport() {
   const fileInput = document.getElementById('csv-file');
   const resultEl = document.getElementById('import-result');
@@ -353,7 +583,11 @@ async function createSupplier() {
 }
 
 function openBatchForm() {
+<<<<<<< HEAD
   document.getElementById('b-product').innerHTML = allProducts.map(p => `<option value="${p.id}">${p.name} (${p.sku})</option>`).join('');
+=======
+  document.getElementById('b-product').innerHTML = allProducts.filter(p => p.is_active).map(p => `<option value="${p.id}">${p.name} (${p.sku})</option>`).join('');
+>>>>>>> 67673ed (Nội dung cập nhật)
   document.getElementById('batch-form').reset();
   document.getElementById('batch-error').classList.add('hidden');
   document.getElementById('batch-dialog').classList.remove('hidden');
@@ -363,12 +597,24 @@ document.getElementById('batch-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errEl = document.getElementById('batch-error');
   errEl.classList.add('hidden');
+<<<<<<< HEAD
+=======
+  const quantity_imported = Number(document.getElementById('b-quantity').value);
+  const import_price = Number(document.getElementById('b-price').value);
+  if (quantity_imported <= 0) { errEl.textContent = 'Số lượng nhập phải lớn hơn 0.'; errEl.classList.remove('hidden'); return; }
+  if (import_price <= 0) { errEl.textContent = 'Giá nhập phải lớn hơn 0.'; errEl.classList.remove('hidden'); return; }
+
+>>>>>>> 67673ed (Nội dung cập nhật)
   const body = {
     product_id: Number(document.getElementById('b-product').value),
     supplier_id: Number(document.getElementById('b-supplier').value),
     batch_code: document.getElementById('b-code').value,
+<<<<<<< HEAD
     quantity_imported: Number(document.getElementById('b-quantity').value),
     import_price: Number(document.getElementById('b-price').value),
+=======
+    quantity_imported, import_price,
+>>>>>>> 67673ed (Nội dung cập nhật)
     expiration_date: document.getElementById('b-expiry').value,
   };
   try {
@@ -377,6 +623,10 @@ document.getElementById('batch-form').addEventListener('submit', async (e) => {
     document.getElementById('batch-dialog').classList.add('hidden');
     await loadProducts();
     await loadBatches();
+<<<<<<< HEAD
+=======
+    await loadReorderSuggestions();
+>>>>>>> 67673ed (Nội dung cập nhật)
   } catch (err) {
     errEl.textContent = err.message;
     errEl.classList.remove('hidden');
@@ -397,6 +647,26 @@ async function loadBatches() {
     </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có lô hàng nào.</td></tr>';
 }
 
+<<<<<<< HEAD
+=======
+async function loadReorderSuggestions() {
+  const rows = await api('/admin/reorder-suggestions');
+  const el = document.getElementById('reorder-suggestions');
+  if (!rows.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="card p-5">
+      <h3 class="font-display text-lg font-medium mb-3">📋 Đề xuất hàng cần nhập (tồn kho thấp)</h3>
+      <div class="space-y-2">
+        ${rows.map(r => `
+          <div class="flex items-center justify-between text-sm border-b border-outline-variant/60 pb-2">
+            <span>${r.name} <span class="text-xs text-on-surface-variant">(${r.sku}) — còn ${r.stock_quantity}</span></span>
+            <span class="text-on-surface-variant text-xs">Gợi ý nhập <strong class="text-primary">${r.suggested_quantity}</strong> từ ${r.last_supplier || 'NCC bất kỳ'}${r.last_import_price ? ' (~' + formatVND(r.last_import_price) + '/sp)' : ''}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 // ---------- Orders ----------
 const ORDER_STATUSES = ['Pending_Payment', 'Processing', 'Shipping', 'Completed', 'Cancelled', 'Returned'];
 const STATUS_LABEL = {
@@ -419,32 +689,183 @@ async function loadOrders() {
       </td>
       <td class="text-xs">${o.shipping_status || '—'}${o.tracking_number ? ' · ' + o.tracking_number : ''}</td>
       <td class="px-4">
+<<<<<<< HEAD
         <button onclick="setTracking(${o.id})" class="text-xs text-primary font-medium">+ Mã vận đơn</button>
+=======
+        <button onclick="setTracking(${o.id})" class="text-xs text-primary font-medium whitespace-nowrap">+ Mã vận đơn</button>
+>>>>>>> 67673ed (Nội dung cập nhật)
       </td>
     </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có đơn hàng nào.</td></tr>';
 }
 
 async function updateOrderStatus(id, order_status) {
+<<<<<<< HEAD
   try {
     await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { order_status } });
     showToast('Đã cập nhật trạng thái đơn hàng');
+=======
+  const isCancelLike = ['Cancelled', 'Returned'].includes(order_status);
+  if (isCancelLike) {
+    const ok = await confirmModal('Chuyển sang trạng thái này sẽ tự động hoàn lại tồn kho cho khách. Tiếp tục?', { confirmText: 'Xác nhận' });
+    if (!ok) { loadOrders(); return; }
+  }
+  try {
+    await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { order_status } });
+    showToast('Đã cập nhật trạng thái đơn hàng — trạng thái vận chuyển và tồn kho đã được đồng bộ.');
+>>>>>>> 67673ed (Nội dung cập nhật)
     loadOrders();
   } catch (err) { showToast(err.message, 'error'); }
 }
 
 async function setTracking(id) {
+<<<<<<< HEAD
   const tracking_number = prompt('Nhập mã vận đơn:');
   if (!tracking_number) return;
   try {
     await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { shipping_status: 'In_Transit', tracking_number } });
     showToast('Đã cập nhật mã vận đơn');
+=======
+  const tracking_number = prompt('Nhập mã vận đơn (dùng để khách tra cứu với đơn vị vận chuyển):');
+  if (!tracking_number) return;
+  try {
+    await api(`/admin/orders/${id}/status`, { method: 'PUT', body: { tracking_number } });
+    showToast('Đã cập nhật mã vận đơn — trạng thái đơn chuyển sang Đang giao.');
+>>>>>>> 67673ed (Nội dung cập nhật)
     loadOrders();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+<<<<<<< HEAD
+(async () => {
+  await loadProducts();
+  await loadSuppliers();
+=======
+// ---------- Vouchers ----------
+function openVoucherForm() {
+  document.getElementById('voucher-form').reset();
+  document.getElementById('voucher-error').classList.add('hidden');
+  document.getElementById('voucher-dialog').classList.remove('hidden');
+}
+
+document.getElementById('voucher-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('voucher-error');
+  errEl.classList.add('hidden');
+  const body = {
+    code: document.getElementById('v-code').value,
+    discount_type: document.getElementById('v-type').value,
+    discount_value: Number(document.getElementById('v-value').value),
+    min_order_value: Number(document.getElementById('v-min').value || 0),
+    end_date: document.getElementById('v-end').value.replace('T', ' ') + ':00',
+  };
+  if (body.discount_value <= 0) { errEl.textContent = 'Giá trị giảm phải lớn hơn 0.'; errEl.classList.remove('hidden'); return; }
+  try {
+    await api('/admin/vouchers', { method: 'POST', body });
+    showToast('Đã tạo khuyến mãi mới');
+    document.getElementById('voucher-dialog').classList.add('hidden');
+    loadVouchers();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  }
+});
+
+async function loadVouchers() {
+  const vouchers = await api('/admin/vouchers');
+  document.getElementById('voucher-rows').innerHTML = vouchers.map(v => `
+    <tr class="border-b border-outline-variant/60">
+      <td class="py-3 px-4 font-medium">${v.code}</td>
+      <td>${v.discount_type === 'Percentage' ? 'Phần trăm' : 'Số tiền cố định'}</td>
+      <td>${v.discount_type === 'Percentage' ? v.discount_value + '%' : formatVND(v.discount_value)}</td>
+      <td>${formatVND(v.min_order_value)}</td>
+      <td class="text-xs">${new Date(v.end_date).toLocaleString('vi-VN')}</td>
+      <td>${v.is_active ? '<span class="chip">Đang chạy</span>' : '<span class="chip bg-outline-variant text-on-surface-variant">Đã tắt</span>'}</td>
+      <td class="px-4"><button onclick="toggleVoucher(${v.id}, ${v.is_active ? 0 : 1})" class="text-xs text-primary font-medium">${v.is_active ? 'Tắt' : 'Bật lại'}</button></td>
+    </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có khuyến mãi nào.</td></tr>';
+}
+
+async function toggleVoucher(id, is_active) {
+  try {
+    await api(`/admin/vouchers/${id}`, { method: 'PUT', body: { is_active } });
+    loadVouchers();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ---------- Users (khóa tài khoản vi phạm) ----------
+async function loadUsers() {
+  const users = await api('/admin/users');
+  document.getElementById('user-rows').innerHTML = users.map(u => `
+    <tr class="border-b border-outline-variant/60">
+      <td class="py-3 px-4 font-medium">${u.full_name}</td>
+      <td>${u.email}</td>
+      <td>${u.phone || '—'}</td>
+      <td>${u.membership_level}</td>
+      <td>${u.accumulated_points}</td>
+      <td>${u.status === 'Active' ? '<span class="chip">Hoạt động</span>' : '<span class="chip" style="background:#ffdad6;color:#ba1a1a;">Đã khóa</span>'}</td>
+      <td class="px-4">
+        ${u.status === 'Active'
+          ? `<button onclick="setUserStatus(${u.id}, 'Suspended')" class="text-xs text-error font-medium">Khóa tài khoản</button>`
+          : `<button onclick="setUserStatus(${u.id}, 'Active')" class="text-xs text-primary font-medium">Mở khóa</button>`}
+      </td>
+    </tr>`).join('') || '<tr><td class="py-4 text-on-surface-variant" colspan="7">Chưa có khách hàng nào.</td></tr>';
+}
+
+async function setUserStatus(id, status) {
+  if (status === 'Suspended') {
+    const ok = await confirmModal('Khóa tài khoản này do vi phạm? Khách sẽ không thể đăng nhập cho tới khi được mở khóa lại.', { danger: true, confirmText: 'Khóa tài khoản' });
+    if (!ok) return;
+  }
+  try {
+    await api(`/admin/users/${id}/status`, { method: 'PUT', body: { status } });
+    showToast(status === 'Active' ? 'Đã mở khóa tài khoản.' : 'Đã khóa tài khoản.');
+    loadUsers();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ---------- Reviews ----------
+async function loadReviews() {
+  const reviews = await api('/admin/reviews');
+  const topLevel = reviews.filter(r => !r.parent_id);
+  const replies = reviews.filter(r => r.parent_id);
+  document.getElementById('review-rows').innerHTML = topLevel.map(r => {
+    const reply = replies.find(rep => rep.parent_id === r.id);
+    return `
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-medium text-sm">${r.reviewer_name} <span class="text-xs text-on-surface-variant">— ${r.product_name} (${r.sku})</span></span>
+        <span class="text-primary text-sm">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mb-2">${new Date(r.created_at).toLocaleString('vi-VN')}</p>
+      ${r.comment ? `<p class="text-sm mb-3">${r.comment}</p>` : ''}
+      ${reply
+        ? `<div class="ml-4 pl-3 border-l-2 border-primary-container"><p class="text-xs font-semibold text-primary">Phản hồi của bạn</p><p class="text-sm mt-1">${reply.comment}</p></div>`
+        : `<button onclick="openReplyDialog(${r.id})" class="btn-ghost text-xs py-1.5 px-3">Phản hồi đánh giá này</button>`}
+    </div>`;
+  }).join('') || '<p class="text-on-surface-variant text-sm">Chưa có đánh giá nào.</p>';
+}
+
+function openReplyDialog(reviewId) {
+  replyingToId = reviewId;
+  document.getElementById('reply-comment').value = '';
+  document.getElementById('reply-dialog').classList.remove('hidden');
+}
+
+async function submitReply() {
+  const comment = document.getElementById('reply-comment').value.trim();
+  if (!comment) { showToast('Vui lòng nhập nội dung phản hồi.', 'error'); return; }
+  try {
+    await api(`/admin/reviews/${replyingToId}/reply`, { method: 'POST', body: { comment } });
+    showToast('Đã gửi phản hồi.');
+    document.getElementById('reply-dialog').classList.add('hidden');
+    loadReviews();
   } catch (err) { showToast(err.message, 'error'); }
 }
 
 (async () => {
   await loadProducts();
   await loadSuppliers();
+  await loadCategoryBrandOptions();
+>>>>>>> 67673ed (Nội dung cập nhật)
 })();
 </script>
 </body>

@@ -57,8 +57,14 @@ tailwind.config = { theme: { extend: { colors: {
       <p id="save-note" class="text-xs text-primary mt-2 hidden"></p>
     </div>
     <div id="result-products" class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8"></div>
+<<<<<<< HEAD
     <div class="text-center">
       <a href="/products.html" class="btn-ghost">Xem thêm sản phẩm khác</a>
+=======
+    <div class="text-center flex flex-wrap gap-3 justify-center">
+      <button onclick="restartQuiz()" class="btn-ghost">Làm lại bài trắc nghiệm</button>
+      <a href="/products.html" class="btn-primary">Xem thêm sản phẩm khác</a>
+>>>>>>> 67673ed (Nội dung cập nhật)
     </div>
   </div>
 </section>
@@ -108,10 +114,15 @@ function toggleConcern(c) {
 }
 
 function startQuiz() {
+<<<<<<< HEAD
+=======
+  document.getElementById('quiz-result').classList.add('hidden');
+>>>>>>> 67673ed (Nội dung cập nhật)
   document.getElementById('quiz-intro').classList.add('hidden');
   document.getElementById('quiz-form').classList.remove('hidden');
 }
 
+<<<<<<< HEAD
 function productImage(p) { return `https://picsum.photos/seed/${p.sku}/600/600`; }
 
 document.getElementById('quiz-form').addEventListener('submit', async (e) => {
@@ -126,19 +137,44 @@ document.getElementById('quiz-form').addEventListener('submit', async (e) => {
     document.getElementById('quiz-form').classList.add('hidden');
     document.getElementById('quiz-result').classList.remove('hidden');
     document.getElementById('result-skin-type').textContent = SKIN_TYPES.find(t => t.value === selectedSkinType).label;
+=======
+function restartQuiz() {
+  selectedSkinType = null;
+  selectedConcerns = new Set();
+  document.querySelectorAll('.skin-type-btn, .concern-btn').forEach(b => b.classList.remove('border-primary', 'bg-secondary-container/30'));
+  document.getElementById('allergy-input').value = '';
+  startQuiz();
+}
+
+async function showResult(skinType, concernsArr, { save = false, allergy = '' } = {}) {
+  try {
+    const products = await api('/products/recommend', {
+      method: 'POST', auth: false,
+      body: { skinType, concerns: concernsArr },
+    });
+    document.getElementById('quiz-intro').classList.add('hidden');
+    document.getElementById('quiz-form').classList.add('hidden');
+    document.getElementById('quiz-result').classList.remove('hidden');
+    document.getElementById('result-skin-type').textContent = SKIN_TYPES.find(t => t.value === skinType)?.label || skinType;
+>>>>>>> 67673ed (Nội dung cập nhật)
     document.getElementById('result-concerns').textContent = concernsArr.length
       ? 'Quan tâm: ' + concernsArr.join(', ')
       : 'Sản phẩm đề xuất dành riêng cho bạn';
 
     document.getElementById('result-products').innerHTML = products.map(p => `
       <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden block">
+<<<<<<< HEAD
         <div class="aspect-square bg-secondary-container/20"><img src="${productImage(p)}" class="w-full h-full object-cover"/></div>
+=======
+        <div class="aspect-square bg-secondary-container/20"><img src="https://picsum.photos/seed/${p.sku}/600/600" class="w-full h-full object-cover"/></div>
+>>>>>>> 67673ed (Nội dung cập nhật)
         <div class="p-3">
           <h3 class="font-display text-sm font-medium mb-1">${p.name}</h3>
           <span class="text-primary font-semibold text-sm">${formatVND(p.price)}</span>
         </div>
       </a>`).join('') || '<p class="col-span-3 text-center text-on-surface-variant">Chưa có sản phẩm phù hợp, vui lòng xem thêm danh mục khác.</p>';
 
+<<<<<<< HEAD
     // Nếu đã đăng nhập, lưu kết quả vào bảng skin_profiles
     const saveNote = document.getElementById('save-note');
     if (Auth.isLoggedIn()) {
@@ -155,11 +191,57 @@ document.getElementById('quiz-form').addEventListener('submit', async (e) => {
     } else {
       saveNote.textContent = 'Đăng nhập để lưu kết quả này vào hồ sơ của bạn cho lần sau.';
       saveNote.classList.remove('hidden');
+=======
+    const saveNote = document.getElementById('save-note');
+    if (save && Auth.isLoggedIn()) {
+      try {
+        await api('/profile/skin', {
+          method: 'PUT',
+          body: { skin_type: skinType, primary_concern: concernsArr.join(', '), allergy_ingredients: allergy || null },
+        });
+        saveNote.textContent = 'Đã lưu kết quả vào hồ sơ của bạn.';
+      } catch (err) {
+        saveNote.textContent = 'Không lưu được kết quả vào hồ sơ: ' + err.message;
+      }
+      saveNote.classList.remove('hidden');
+    } else if (!Auth.isLoggedIn()) {
+      saveNote.textContent = 'Đăng nhập để lưu kết quả này vào hồ sơ của bạn cho lần sau.';
+      saveNote.classList.remove('hidden');
+    } else {
+      saveNote.classList.add('hidden');
+>>>>>>> 67673ed (Nội dung cập nhật)
     }
   } catch (err) {
     showToast(err.message, 'error');
   }
+<<<<<<< HEAD
 });
+=======
+}
+
+document.getElementById('quiz-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (!selectedSkinType) { showToast('Vui lòng chọn loại da của bạn', 'error'); return; }
+  const concernsArr = Array.from(selectedConcerns);
+  showResult(selectedSkinType, concernsArr, { save: true, allergy: document.getElementById('allergy-input').value });
+});
+
+// Khắc phục lỗi "thoát ra vào lại bị mất kết quả cũ": nếu đã đăng nhập và đã có hồ sơ làn da,
+// hiển thị lại kết quả đó ngay khi vào trang, không bắt làm lại từ đầu.
+async function restoreSavedResultIfAny() {
+  if (!Auth.isLoggedIn()) return;
+  try {
+    const me = await api('/profile');
+    if (me.skin_profile && me.skin_profile.skin_type) {
+      selectedSkinType = me.skin_profile.skin_type;
+      const concerns = (me.skin_profile.primary_concern || '').split(',').map(s => s.trim()).filter(Boolean);
+      selectedConcerns = new Set(concerns);
+      await showResult(selectedSkinType, concerns, { save: false });
+    }
+  } catch (err) { /* chưa có hồ sơ -> giữ màn hình intro mặc định */ }
+}
+restoreSavedResultIfAny();
+>>>>>>> 67673ed (Nội dung cập nhật)
 </script>
 </body>
 </html>

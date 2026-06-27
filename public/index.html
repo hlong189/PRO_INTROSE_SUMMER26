@@ -34,7 +34,11 @@ tailwind.config = { theme: { extend: { colors: {
     </div>
   </div>
   <div class="rounded-lg overflow-hidden h-72 md:h-[420px]">
+<<<<<<< HEAD
     <img src="https://picsum.photos/seed/lumiere-hero/900/700" class="w-full h-full object-cover" alt="NT-II"/>
+=======
+    <img src="https://picsum.photos/seed/ntii-hero/900/700" class="w-full h-full object-cover" alt="NT-II"/>
+>>>>>>> 67673ed (Nội dung cập nhật)
   </div>
 </section>
 
@@ -72,6 +76,7 @@ tailwind.config = { theme: { extend: { colors: {
 <script>
 renderNavbar('home');
 
+<<<<<<< HEAD
 function productImage(p) {
   return `https://picsum.photos/seed/${p.sku}/600/600`;
 }
@@ -81,6 +86,13 @@ function productCard(p) {
   <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden group block">
     <div class="aspect-square overflow-hidden bg-secondary-container/20">
       <img src="${productImage(p)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="${p.name}"/>
+=======
+function productCard(p) {
+  return `
+  <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden group block">
+    <div class="aspect-square overflow-hidden bg-secondary-container/20 group-hover:scale-105 transition-transform duration-300">
+      <img src="https://picsum.photos/seed/${p.sku}/600/600" class="w-full h-full object-cover" alt="${p.name}"/>
+>>>>>>> 67673ed (Nội dung cập nhật)
     </div>
     <div class="p-4">
       <p class="text-label-caps text-on-surface-variant mb-1">${p.category_name || ''}</p>

@@ -53,6 +53,18 @@ tailwind.config = { theme: { extend: { colors: {
     </label>
 
     <p id="error-msg" class="text-error text-sm hidden"></p>
+<<<<<<< HEAD
+=======
+
+    <div id="payment-confirm-panel" class="hidden card p-5 bg-secondary-container/20">
+      <div id="payment-confirm-content"></div>
+      <label class="flex items-center gap-2 mt-4 text-sm cursor-pointer">
+        <input type="checkbox" id="payment-confirmed-checkbox" class="w-4 h-4 accent-primary"/>
+        <span id="payment-confirmed-label">Tôi đã thanh toán thành công</span>
+      </label>
+    </div>
+
+>>>>>>> 67673ed (Nội dung cập nhật)
     <button type="submit" id="submit-btn" class="btn-primary w-full">Hoàn tất đặt hàng</button>
   </form>
 </section>
@@ -65,14 +77,68 @@ renderNavbar();
 const checkoutInfo = JSON.parse(sessionStorage.getItem('ntii_checkout') || 'null');
 if (!checkoutInfo) window.location.href = '/checkout-confirm.html';
 
+<<<<<<< HEAD
+=======
+const fakeTxnCode = 'NTII' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+const PAYMENT_PANELS = {
+  COD: null,
+  Bank_Transfer: `
+    <p class="text-label-caps text-on-surface-variant mb-2">Thông tin chuyển khoản</p>
+    <p class="text-sm">Ngân hàng: <strong>Vietcombank</strong></p>
+    <p class="text-sm">Số tài khoản: <strong>0123 456 789</strong></p>
+    <p class="text-sm">Chủ tài khoản: <strong>CONG TY NT-II</strong></p>
+    <p class="text-sm">Nội dung chuyển khoản: <strong>${fakeTxnCode}</strong></p>`,
+  VNPay: `
+    <p class="text-label-caps text-on-surface-variant mb-2">Quét mã QR để thanh toán qua VNPay</p>
+    <div class="w-32 h-32 bg-white border border-outline-variant flex items-center justify-center mx-auto mb-2 text-xs text-on-surface-variant">[ Mã QR VNPay ]</div>
+    <p class="text-sm text-center">Mã giao dịch: <strong>${fakeTxnCode}</strong></p>`,
+  Momo: `
+    <p class="text-label-caps text-on-surface-variant mb-2">Quét mã QR để thanh toán qua Momo</p>
+    <div class="w-32 h-32 bg-white border border-outline-variant flex items-center justify-center mx-auto mb-2 text-xs text-on-surface-variant">[ Mã QR Momo ]</div>
+    <p class="text-sm text-center">Mã giao dịch: <strong>${fakeTxnCode}</strong></p>`,
+};
+
+function updatePaymentPanel() {
+  const method = document.querySelector('input[name="payment"]:checked').value;
+  const panel = document.getElementById('payment-confirm-panel');
+  const checkbox = document.getElementById('payment-confirmed-checkbox');
+  if (method === 'COD') {
+    panel.classList.add('hidden');
+    checkbox.checked = false;
+  } else {
+    panel.classList.remove('hidden');
+    document.getElementById('payment-confirm-content').innerHTML = PAYMENT_PANELS[method];
+    document.getElementById('payment-confirmed-label').textContent =
+      method === 'Bank_Transfer' ? 'Tôi đã chuyển khoản thành công' : 'Tôi đã thanh toán thành công qua ứng dụng';
+    checkbox.checked = false;
+  }
+}
+document.querySelectorAll('input[name="payment"]').forEach((r) => r.addEventListener('change', updatePaymentPanel));
+updatePaymentPanel();
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 document.getElementById('payment-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errEl = document.getElementById('error-msg');
   const btn = document.getElementById('submit-btn');
   errEl.classList.add('hidden');
+<<<<<<< HEAD
   btn.disabled = true; btn.textContent = 'Đang xử lý...';
   const payment_method = document.querySelector('input[name="payment"]:checked').value;
 
+=======
+  const payment_method = document.querySelector('input[name="payment"]:checked').value;
+
+  if (payment_method !== 'COD' && !document.getElementById('payment-confirmed-checkbox').checked) {
+    errEl.textContent = 'Vui lòng xác nhận đã thanh toán trước khi hoàn tất đặt hàng.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Đang xử lý...';
+
+>>>>>>> 67673ed (Nội dung cập nhật)
   const items = CartStore.getAll().map(i => ({ product_id: i.product_id, quantity: i.quantity }));
   if (!items.length) { window.location.href = '/cart.html'; return; }
 
@@ -82,6 +148,10 @@ document.getElementById('payment-form').addEventListener('submit', async (e) => 
       body: {
         items,
         payment_method,
+<<<<<<< HEAD
+=======
+        payment_confirmed: payment_method !== 'COD',
+>>>>>>> 67673ed (Nội dung cập nhật)
         recipient_name: checkoutInfo.recipient_name,
         recipient_phone: checkoutInfo.recipient_phone,
         province_city: checkoutInfo.province_city,

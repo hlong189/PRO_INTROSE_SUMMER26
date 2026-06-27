@@ -50,6 +50,7 @@ tailwind.config = { theme: { extend: { colors: {
 <script>
 renderNavbar('products');
 
+<<<<<<< HEAD
 function productImage(p) { return `https://picsum.photos/seed/${p.sku}/600/600`; }
 
 function productCard(p) {
@@ -57,6 +58,13 @@ function productCard(p) {
   <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden group block">
     <div class="aspect-square overflow-hidden bg-secondary-container/20">
       <img src="${productImage(p)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="${p.name}"/>
+=======
+function productCard(p) {
+  return `
+  <a href="/product-detail.html?sku=${p.sku}" class="card overflow-hidden group block">
+    <div class="aspect-square overflow-hidden bg-secondary-container/20 group-hover:scale-105 transition-transform duration-300">
+      <img src="https://picsum.photos/seed/${p.sku}/600/600" class="w-full h-full object-cover" alt="${p.name}"/>
+>>>>>>> 67673ed (Nội dung cập nhật)
     </div>
     <div class="p-4">
       <p class="text-label-caps text-on-surface-variant mb-1">${p.brand_name || ''}</p>
@@ -83,7 +91,11 @@ async function loadFilters() {
   const catSel = document.getElementById('f-category');
   cats.forEach(c => {
     const opt = document.createElement('option');
+<<<<<<< HEAD
     opt.value = c.category_name; opt.textContent = `${c.category_name} (${c.product_count})`;
+=======
+    opt.value = c.category_name; opt.textContent = c.category_name;
+>>>>>>> 67673ed (Nội dung cập nhật)
     catSel.appendChild(opt);
   });
 
@@ -91,7 +103,11 @@ async function loadFilters() {
   const brandSel = document.getElementById('f-brand');
   brands.forEach(b => {
     const opt = document.createElement('option');
+<<<<<<< HEAD
     opt.value = b.brand_name; opt.textContent = `${b.brand_name} (${b.product_count})`;
+=======
+    opt.value = b.brand_name; opt.textContent = b.brand_name;
+>>>>>>> 67673ed (Nội dung cập nhật)
     brandSel.appendChild(opt);
   });
 

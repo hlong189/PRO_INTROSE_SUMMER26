@@ -2,6 +2,10 @@
 const express = require('express');
 const { query, get, pool, transaction } = require('../db/database');
 const { verifyToken } = require('../middleware/auth');
+<<<<<<< HEAD
+=======
+const { isValidPhone, isValidPlaceName, isValidAddressLine } = require('../utils/validators');
+>>>>>>> 67673ed (Nội dung cập nhật)
 
 const router = express.Router();
 router.use(verifyToken);
@@ -16,6 +20,19 @@ function computeMembership(points) {
   return 'Bronze';
 }
 
+<<<<<<< HEAD
+=======
+// GET /api/orders/available-vouchers?subtotal=  - danh sách mã giảm giá còn dùng được, để hiển thị dạng dropdown
+router.get('/available-vouchers', async (req, res) => {
+  const subtotal = Number(req.query.subtotal || 0);
+  const vouchers = await query(
+    'SELECT id, code, discount_type, discount_value, min_order_value FROM vouchers WHERE is_active = 1 AND end_date >= NOW() AND min_order_value <= ? ORDER BY discount_value DESC',
+    [subtotal]
+  );
+  res.json(vouchers);
+});
+
+>>>>>>> 67673ed (Nội dung cập nhật)
 // POST /api/orders/validate-voucher  { code, subtotal }
 router.post('/validate-voucher', async (req, res) => {
   const { code, subtotal } = req.body;
@@ -36,15 +53,45 @@ router.post('/validate-voucher', async (req, res) => {
 
 // POST /api/orders  - Checkout: tạo order + order_items + payments + shippings trong 1 transaction
 router.post('/', async (req, res) => {
+<<<<<<< HEAD
   const { items, voucher_code, payment_method, recipient_name, recipient_phone, province_city, ward, specific_address } = req.body;
+=======
+  const { items, voucher_code, payment_method, payment_confirmed, recipient_name, recipient_phone, province_city, ward, specific_address } = req.body;
+>>>>>>> 67673ed (Nội dung cập nhật)
 
   if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Giỏ hàng đang trống.' });
   if (!recipient_name || !recipient_phone || !province_city || !ward || !specific_address) {
     return res.status(400).json({ error: 'Vui lòng nhập đầy đủ thông tin người nhận và địa chỉ giao hàng.' });
   }
+<<<<<<< HEAD
   if (!['COD', 'Bank_Transfer', 'VNPay', 'Momo'].includes(payment_method)) {
     return res.status(400).json({ error: 'Phương thức thanh toán không hợp lệ.' });
   }
+=======
+  if (!isValidPhone(recipient_phone)) {
+    return res.status(400).json({ error: 'Số điện thoại người nhận không hợp lệ — phải gồm đúng 10 số, không chứa chữ.' });
+  }
+  if (!isValidPlaceName(province_city)) {
+    return res.status(400).json({ error: 'Tỉnh/Thành phố không hợp lệ — không được chỉ nhập số.' });
+  }
+  if (!isValidPlaceName(ward)) {
+    return res.status(400).json({ error: 'Phường/Xã không hợp lệ — không được chỉ nhập số.' });
+  }
+  if (!isValidAddressLine(specific_address)) {
+    return res.status(400).json({ error: 'Địa chỉ cụ thể không hợp lệ — vui lòng nhập đầy đủ số nhà, đường.' });
+  }
+  if (!['COD', 'Bank_Transfer', 'VNPay', 'Momo'].includes(payment_method)) {
+    return res.status(400).json({ error: 'Phương thức thanh toán không hợp lệ.' });
+  }
+  if (payment_method !== 'COD' && !payment_confirmed) {
+    return res.status(400).json({ error: 'Vui lòng xác nhận đã thanh toán trước khi hoàn tất đặt hàng.' });
+  }
+  for (const item of items) {
+    if (!Number.isInteger(Number(item.quantity)) || Number(item.quantity) < 1) {
+      return res.status(400).json({ error: 'Số lượng sản phẩm trong giỏ hàng không hợp lệ.' });
+    }
+  }
+>>>>>>> 67673ed (Nội dung cập nhật)
 
   try {
     const order = await transaction(async (conn) => {

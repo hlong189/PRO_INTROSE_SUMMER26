@@ -49,6 +49,10 @@ const STATUS_COLOR = {
 
 function orderCard(o) {
   const canCancel = ['Pending_Payment', 'Processing'].includes(o.order_status);
+<<<<<<< HEAD
+=======
+  const canReview = o.order_status === 'Completed';
+>>>>>>> 67673ed (Nội dung cập nhật)
   return `
   <div class="card p-5">
     <div class="flex items-center justify-between mb-3">
@@ -58,10 +62,21 @@ function orderCard(o) {
       </div>
       <span class="chip" style="${STATUS_COLOR[o.order_status] || ''}">${STATUS_LABEL[o.order_status] || o.order_status}</span>
     </div>
+<<<<<<< HEAD
     <div class="text-sm text-on-surface-variant mb-3">
       ${o.items.map(i => `${i.product_name} x${i.quantity}`).join(', ')}
     </div>
     ${o.shipping && o.shipping.tracking_number ? `<p class="text-xs text-on-surface-variant mb-2">Mã vận đơn: ${o.shipping.tracking_number} — ${o.shipping.shipping_status}</p>` : ''}
+=======
+    <div class="text-sm text-on-surface-variant mb-3 space-y-1">
+      ${o.items.map(i => `
+        <div class="flex items-center justify-between">
+          <span>${i.product_name} x${i.quantity}</span>
+          ${canReview ? `<a href="/product-detail.html?sku=${i.sku}#reviews-section" class="text-primary text-xs font-semibold">Đánh giá sản phẩm này →</a>` : ''}
+        </div>`).join('')}
+    </div>
+    ${o.shipping && o.shipping.tracking_number ? `<p class="text-xs text-on-surface-variant mb-2">📦 Mã vận đơn (dùng để tra cứu với đơn vị vận chuyển): <strong>${o.shipping.tracking_number}</strong> — ${o.shipping.shipping_status}</p>` : ''}
+>>>>>>> 67673ed (Nội dung cập nhật)
     <div class="flex items-center justify-between border-t border-outline-variant pt-3">
       <span class="text-sm text-on-surface-variant">Tổng cộng</span>
       <span class="font-display font-semibold text-primary">${formatVND(o.final_amount)}</span>
@@ -80,7 +95,12 @@ async function load() {
 }
 
 async function cancelOrder(id) {
+<<<<<<< HEAD
   if (!confirm('Bạn có chắc muốn hủy đơn hàng này?')) return;
+=======
+  const ok = await confirmModal('Bạn có chắc muốn hủy đơn hàng này? Hàng sẽ được hoàn lại vào kho.', { danger: true, confirmText: 'Hủy đơn hàng' });
+  if (!ok) return;
+>>>>>>> 67673ed (Nội dung cập nhật)
   try {
     await api(`/orders/${id}/cancel`, { method: 'PUT' });
     showToast('Đã hủy đơn hàng.');

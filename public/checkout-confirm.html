@@ -37,7 +37,13 @@ tailwind.config = { theme: { extend: { colors: {
     <div id="order-summary" class="space-y-3 mb-4"></div>
 
     <div class="flex gap-2 mb-4">
+<<<<<<< HEAD
       <input id="voucher-code" placeholder="Mã giảm giá (nếu có)" class="input-field flex-1"/>
+=======
+      <select id="voucher-select" class="input-field flex-1">
+        <option value="">— Không dùng mã giảm giá —</option>
+      </select>
+>>>>>>> 67673ed (Nội dung cập nhật)
       <button type="button" onclick="applyVoucher()" class="btn-ghost whitespace-nowrap px-4">Áp dụng</button>
     </div>
     <p id="voucher-msg" class="text-sm mb-4 hidden"></p>
@@ -111,10 +117,38 @@ function updateTotals() {
   document.getElementById('sum-total').nextSibling;
 }
 
+<<<<<<< HEAD
 async function applyVoucher() {
   const code = document.getElementById('voucher-code').value.trim();
   const msg = document.getElementById('voucher-msg');
   if (!code) return;
+=======
+async function loadAvailableVouchers() {
+  const sel = document.getElementById('voucher-select');
+  try {
+    const vouchers = await api('/orders/available-vouchers?subtotal=' + CartStore.subtotal());
+    vouchers.forEach((v) => {
+      const label = v.discount_type === 'Percentage'
+        ? `${v.code} — Giảm ${v.discount_value}%`
+        : `${v.code} — Giảm ${formatVND(v.discount_value)}`;
+      const opt = document.createElement('option');
+      opt.value = v.code;
+      opt.textContent = label + (Number(v.min_order_value) > 0 ? ` (đơn từ ${formatVND(v.min_order_value)})` : '');
+      sel.appendChild(opt);
+    });
+  } catch (err) { /* ignore */ }
+}
+
+async function applyVoucher() {
+  const code = document.getElementById('voucher-select').value;
+  const msg = document.getElementById('voucher-msg');
+  if (!code) {
+    appliedDiscount = 0; appliedVoucherCode = null;
+    msg.classList.add('hidden');
+    updateTotals();
+    return;
+  }
+>>>>>>> 67673ed (Nội dung cập nhật)
   try {
     const result = await api('/orders/validate-voucher', { method: 'POST', body: { code, subtotal: CartStore.subtotal() } });
     appliedDiscount = result.discount_amount;
@@ -142,6 +176,7 @@ async function prefill() {
 
 renderSummary();
 prefill();
+<<<<<<< HEAD
 
 document.getElementById('confirm-form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -151,6 +186,25 @@ document.getElementById('confirm-form').addEventListener('submit', (e) => {
     province_city: document.getElementById('province_city').value,
     ward: document.getElementById('ward').value,
     specific_address: document.getElementById('specific_address').value,
+=======
+loadAvailableVouchers();
+
+document.getElementById('confirm-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const recipient_name = document.getElementById('recipient_name').value.trim();
+  const recipient_phone = document.getElementById('recipient_phone').value.trim();
+  const province_city = document.getElementById('province_city').value.trim();
+  const ward = document.getElementById('ward').value.trim();
+  const specific_address = document.getElementById('specific_address').value.trim();
+
+  if (!Validate.phone(recipient_phone)) { showToast('Số điện thoại không hợp lệ — phải gồm đúng 10 số, không chứa chữ.', 'error'); return; }
+  if (!Validate.placeName(province_city)) { showToast('Tỉnh/Thành phố không hợp lệ — không được chỉ nhập số.', 'error'); return; }
+  if (!Validate.placeName(ward)) { showToast('Phường/Xã không hợp lệ — không được chỉ nhập số.', 'error'); return; }
+  if (!Validate.addressLine(specific_address)) { showToast('Vui lòng nhập đầy đủ địa chỉ cụ thể.', 'error'); return; }
+
+  const shipping = {
+    recipient_name, recipient_phone, province_city, ward, specific_address,
+>>>>>>> 67673ed (Nội dung cập nhật)
     voucher_code: appliedVoucherCode,
     discount_amount: appliedDiscount,
   };

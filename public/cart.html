@@ -33,7 +33,11 @@ renderNavbar();
 
 const SHIPPING_FEE = 30000;
 const FREE_SHIP_THRESHOLD = 500000;
+<<<<<<< HEAD
 function productImage(sku) { return `https://picsum.photos/seed/${sku}/200/200`; }
+=======
+function productImage(item) { return `<div class="w-20 h-20 rounded overflow-hidden"><img src="https://picsum.photos/seed/${item.sku}/200/200" class="w-full h-full object-cover"/></div>`; }
+>>>>>>> 67673ed (Nội dung cập nhật)
 
 function emptyState() {
   return `<div class="text-center py-20">
@@ -55,7 +59,11 @@ function render() {
     <div class="space-y-4 mb-8">
       ${items.map(item => `
         <div class="card p-4 flex gap-4 items-center">
+<<<<<<< HEAD
           <img src="${productImage(item.sku)}" class="w-20 h-20 object-cover rounded"/>
+=======
+          ${productImage(item)}
+>>>>>>> 67673ed (Nội dung cập nhật)
           <div class="flex-1">
             <a href="/product-detail.html?sku=${item.sku}" class="font-display font-medium hover:text-primary">${item.name}</a>
             <p class="text-primary font-semibold mt-1">${formatVND(item.price)}</p>
@@ -78,12 +86,26 @@ function render() {
     </div>`;
 }
 
+<<<<<<< HEAD
 function updateQty(productId, qty) {
+=======
+async function updateQty(productId, qty) {
+  if (qty <= 0) {
+    const ok = await confirmModal('Giảm số lượng về 0 sẽ xóa sản phẩm này khỏi giỏ hàng. Bạn có chắc muốn tiếp tục?', { danger: true, confirmText: 'Xóa khỏi giỏ' });
+    if (!ok) { render(); return; }
+  }
+>>>>>>> 67673ed (Nội dung cập nhật)
   CartStore.setQuantity(productId, qty);
   render();
 }
 
+<<<<<<< HEAD
 function removeItem(productId) {
+=======
+async function removeItem(productId) {
+  const ok = await confirmModal('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?', { danger: true, confirmText: 'Xóa' });
+  if (!ok) return;
+>>>>>>> 67673ed (Nội dung cập nhật)
   CartStore.remove(productId);
   render();
 }
